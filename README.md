@@ -14,7 +14,7 @@ Orbit is a module for the **Orbyte** business hub. Orbyte is the host platform; 
 | **SDG Track (1–17)**  | SDG 8 — Decent Work and Economic Growth (targets 8.2 and 8.3); also SDG 9 — Industry, Innovation and Infrastructure |
 | **Team Leader**       | Tharmunieshwar A/L Prakasam                                          |
 | **University**        | Universiti Tunku Abdul Rahman (UTAR)                                 |
-| **Number of Members** | [TEAM TO FILL]                                                       |
+| **Number of Members** | 3                                                     |
 
 ## Links
 
