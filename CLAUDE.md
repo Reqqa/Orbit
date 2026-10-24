@@ -1,7 +1,9 @@
 # CLAUDE.md — standing rules for this repo
 
 Orbit, payment reconciliation for the Orbyte hub.
+The brief this is judged against: `docs/HACKATHON.md`.
 Full specification: `docs/SPEC.md`. Build order: `docs/STEPS.md`.
+How the code works: `docs/ARCHITECTURE.md`.
 How the code fits together: `docs/ARCHITECTURE.md`.
 
 ## Naming

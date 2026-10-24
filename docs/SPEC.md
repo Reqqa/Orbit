@@ -7,6 +7,11 @@
 
 ---
 
+> **The brief this is built against** is recorded verbatim in
+> [`HACKATHON.md`](HACKATHON.md): the problem statement, the six must-have features,
+> the rules and boundaries, and the marking rubric. Where this spec and the brief
+> disagree, the brief wins.
+
 ## 0. How to use this spec with Claude Code
 
 - Standing rules live in `CLAUDE.md` in the repo root (Claude Code reads it automatically). Section 20 lists them.

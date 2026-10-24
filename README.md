@@ -392,10 +392,13 @@ frontend/           Next.js dashboard, static export into frontend/out
 scripts/            eval_accuracy.py (writes docs/accuracy.md),
                     replit-start.sh (the Replit boot sequence)
 .replit             Replit run configuration — committed, unverified
-docs/               SPEC.md, STEPS.md, ARCHITECTURE.md, accuracy.md,
+docs/               HACKATHON.md, SPEC.md, STEPS.md, ARCHITECTURE.md, accuracy.md,
                     demo-script.md, connect-*.md, proof/
 ```
 
+- [**`docs/HACKATHON.md`**](docs/HACKATHON.md) — the official brief this is judged
+  against: the problem statement, the six must-have features, the rules and
+  boundaries, and the marking rubric.
 - [**`docs/SPEC.md`**](docs/SPEC.md) — the full specification, including every decision
   and why.
 - [**`docs/ARCHITECTURE.md`**](docs/ARCHITECTURE.md) — how the code actually works:
