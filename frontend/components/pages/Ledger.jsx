@@ -82,30 +82,30 @@ export default function Ledger() {
                 ['Outstanding', invoice.outstanding_display],
               ].map(([label, value]) => (
                 <div key={label}>
-                  <dt className="text-xs uppercase tracking-wide text-[--color-muted]">{label}</dt>
+                  <dt className="text-xs uppercase tracking-wide text-(--color-muted)">{label}</dt>
                   <dd className="tabular mt-1 font-medium">{value}</dd>
                 </div>
               ))}
             </dl>
 
             {detail.events?.length ? (
-              <ol className="space-y-5 border-l border-[--color-line] pl-5">
+              <ol className="space-y-5 border-l border-(--color-line) pl-5">
                 {detail.events.map((event, index) => (
                   <li key={index} className="relative">
                     <span
-                      className="absolute -left-[26px] top-1.5 h-2.5 w-2.5 rounded-full ring-2 ring-[--color-surface]"
+                      className="absolute -left-[26px] top-1.5 h-2.5 w-2.5 rounded-full ring-2 ring-(--color-surface)"
                       style={{ background: `var(${DOT[event.kind] ?? '--color-line'})` }}
                     />
-                    <p className="text-xs text-[--color-muted]">{day(event.at)}</p>
+                    <p className="text-xs text-(--color-muted)">{day(event.at)}</p>
                     <p className="mt-0.5 text-sm font-medium">{event.title}</p>
                     {event.detail && (
-                      <p className="mt-0.5 text-sm text-[--color-muted]">{event.detail}</p>
+                      <p className="mt-0.5 text-sm text-(--color-muted)">{event.detail}</p>
                     )}
                   </li>
                 ))}
               </ol>
             ) : (
-              <p className="rounded-[--radius-inner] border border-dashed border-[--color-line] px-4 py-8 text-center text-sm text-[--color-muted]">
+              <p className="rounded-(--radius-inner) border border-dashed border-(--color-line) px-4 py-8 text-center text-sm text-(--color-muted)">
                 Nothing has happened to this invoice since it was created. Send a reminder from
                 Chasing, or receive a receipt in the simulator.
               </p>
@@ -120,8 +120,7 @@ export default function Ledger() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-lg font-semibold">Ledger</h1>
-        <p className="mt-1 text-sm text-[--color-muted]">
+        <p className="mt-1 text-sm text-(--color-muted)">
           Every invoice and what is still owed on it. Click a row for its full history.
         </p>
       </div>
@@ -132,10 +131,10 @@ export default function Ledger() {
             key={item.key}
             onClick={() => setFilter(item.key)}
             aria-pressed={filter === item.key}
-            className={`rounded-[--radius-inner] px-3 py-1.5 text-sm transition ${
+            className={`rounded-(--radius-inner) px-3 py-1.5 text-sm transition ${
               filter === item.key
-                ? 'bg-[--color-brand-soft] font-medium text-[--color-brand]'
-                : 'border border-[--color-line] bg-[--color-surface] text-[--color-muted] hover:bg-[--color-sunken]'
+                ? 'bg-(--color-brand-soft) font-medium text-(--color-brand)'
+                : 'border border-(--color-line) bg-(--color-surface) text-(--color-muted) hover:bg-(--color-sunken)'
             }`}
           >
             {item.label}
@@ -157,7 +156,7 @@ export default function Ledger() {
               <>
                 <Cell className="font-medium whitespace-nowrap">{row.invoice_no}</Cell>
                 <Cell>{row.customer_name}</Cell>
-                <Cell className="whitespace-nowrap text-[--color-muted]">
+                <Cell className="whitespace-nowrap text-(--color-muted)">
                   <span className="tabular">{day(row.due_date)}</span>
                   {row.days_overdue > 0 && (
                     <Badge tone="bad" className="ml-2">{row.days_overdue} days late</Badge>

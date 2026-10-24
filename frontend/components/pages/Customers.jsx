@@ -67,8 +67,7 @@ export default function Customers() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-lg font-semibold">Customers</h1>
-        <p className="mt-1 text-sm text-[--color-muted]">
+        <p className="mt-1 text-sm text-(--color-muted)">
           Who owes what, when they last paid, and how often they have been chased.
         </p>
       </div>
@@ -85,10 +84,10 @@ export default function Customers() {
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search a name or nickname"
           aria-label="Search customers by name or alias"
-          className="w-full rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm sm:w-72"
+          className="w-full rounded-(--radius-inner) border border-(--color-line) bg-(--color-surface) px-3 py-2 text-sm sm:w-72"
         />
         <div className="flex items-center gap-2">
-          <span className="text-xs uppercase tracking-wide text-[--color-muted]">Sort</span>
+          <span className="text-xs uppercase tracking-wide text-(--color-muted)">Sort</span>
           {[
             ['balance', 'Highest balance'],
             ['name', 'Name A–Z'],
@@ -97,10 +96,10 @@ export default function Customers() {
               key={key}
               onClick={() => setSort(key)}
               aria-pressed={sort === key}
-              className={`rounded-[--radius-inner] px-3 py-1.5 text-sm transition ${
+              className={`rounded-(--radius-inner) px-3 py-1.5 text-sm transition ${
                 sort === key
-                  ? 'bg-[--color-brand-soft] font-medium text-[--color-brand]'
-                  : 'border border-[--color-line] bg-[--color-surface] text-[--color-muted] hover:bg-[--color-sunken]'
+                  ? 'bg-(--color-brand-soft) font-medium text-(--color-brand)'
+                  : 'border border-(--color-line) bg-(--color-surface) text-(--color-muted) hover:bg-(--color-sunken)'
               }`}
             >
               {label}
@@ -123,12 +122,12 @@ export default function Customers() {
                 <Cell>
                   <span className="font-medium">{row.name}</span>
                   {aliasList(row.aliases).length > 0 && (
-                    <span className="mt-0.5 block text-xs text-[--color-muted]">
+                    <span className="mt-0.5 block text-xs text-(--color-muted)">
                       also known as {aliasList(row.aliases).join(', ')}
                     </span>
                   )}
                   <span className="mt-1 flex flex-wrap items-center gap-1.5">
-                    <span className="tabular text-xs text-[--color-muted]">{row.phone_masked}</span>
+                    <span className="tabular text-xs text-(--color-muted)">{row.phone_masked}</span>
                     {flagList(row.flags).map((flag) => (
                       <Badge key={flag} tone="bad">
                         {flag}
@@ -143,23 +142,23 @@ export default function Customers() {
                   {row.last_payment ? (
                     <>
                       <span className="tabular">{row.last_payment.amount_display}</span>
-                      <span className="mt-0.5 block text-xs text-[--color-muted]">
+                      <span className="mt-0.5 block text-xs text-(--color-muted)">
                         {day(row.last_payment.paid_at)}
                       </span>
                     </>
                   ) : (
-                    <span className="text-[--color-muted]">Never paid</span>
+                    <span className="text-(--color-muted)">Never paid</span>
                   )}
                 </Cell>
                 <Cell className="tabular text-right">{row.reminders_sent ?? 0}</Cell>
-                <Cell className="text-[--color-muted]">{row.language}</Cell>
+                <Cell className="text-(--color-muted)">{row.language}</Cell>
               </>
             )}
           />
         </Card>
       )}
 
-      <p className="text-xs text-[--color-muted]">
+      <p className="text-xs text-(--color-muted)">
         Phone numbers are stored encrypted. Orbit only ever displays the last four digits, and
         nothing on this screen can reveal the rest.
       </p>

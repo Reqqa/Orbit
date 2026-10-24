@@ -94,14 +94,13 @@ export default function Simulator({ session, goTo }) {
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <h1 className="text-lg font-semibold">WhatsApp simulator</h1>
         <SimulatedNote>
           Simulated channel. Identical webhook payloads to the real WhatsApp Cloud API, so the
           pipeline being demonstrated is the one that ships.
         </SimulatedNote>
-        <p className="text-sm text-[--color-muted]">
+        <p className="text-sm text-(--color-muted)">
           Business number{' '}
-          <span className="tabular font-medium text-[--color-ink]">
+          <span className="tabular font-medium text-(--color-ink)">
             {session.tenant_whatsapp_number || 'not configured'}
           </span>
         </p>
@@ -118,12 +117,12 @@ export default function Simulator({ session, goTo }) {
         <div className="grid gap-5 lg:grid-cols-2">
           <Card title="The customer's phone">
             <form onSubmit={send} className="space-y-3">
-              <label className="block text-xs font-medium text-[--color-muted]">
+              <label className="block text-xs font-medium text-(--color-muted)">
                 Sending as
                 <select
                   value={customerId}
                   onChange={(event) => setCustomerId(event.target.value)}
-                  className="mt-1 w-full rounded-[--radius-inner] border border-[--color-line] bg-white px-3 py-2 text-sm text-[--color-ink]"
+                  className="mt-1 w-full rounded-(--radius-inner) border border-(--color-line) bg-white px-3 py-2 text-sm text-(--color-ink)"
                 >
                   {customers.map((customer) => (
                     <option key={customer.id} value={customer.id}>
@@ -133,24 +132,24 @@ export default function Simulator({ session, goTo }) {
                 </select>
               </label>
 
-              <label className="block text-xs font-medium text-[--color-muted]">
+              <label className="block text-xs font-medium text-(--color-muted)">
                 Receipt photo
                 <input
                   type="file"
                   accept="image/*"
                   onChange={pickFile}
-                  className="mt-1 w-full rounded-[--radius-inner] border border-[--color-line] bg-white px-3 py-2 text-sm text-[--color-ink]"
+                  className="mt-1 w-full rounded-(--radius-inner) border border-(--color-line) bg-white px-3 py-2 text-sm text-(--color-ink)"
                 />
               </label>
               {fileNote && <SimulatedNote>{fileNote}</SimulatedNote>}
 
-              <label className="block text-xs font-medium text-[--color-muted]">
+              <label className="block text-xs font-medium text-(--color-muted)">
                 Message (optional)
                 <input
                   value={text}
                   onChange={(event) => setText(event.target.value)}
                   placeholder="Paid already boss"
-                  className="mt-1 w-full rounded-[--radius-inner] border border-[--color-line] bg-white px-3 py-2 text-sm text-[--color-ink]"
+                  className="mt-1 w-full rounded-(--radius-inner) border border-(--color-line) bg-white px-3 py-2 text-sm text-(--color-ink)"
                 />
               </label>
 
@@ -160,9 +159,9 @@ export default function Simulator({ session, goTo }) {
               {sendError && <ErrorNote error={sendError} />}
             </form>
 
-            <div className="mt-4 max-h-96 space-y-3 overflow-y-auto rounded-[--radius-card] bg-[--color-sunken] p-3">
+            <div className="mt-4 max-h-96 space-y-3 overflow-y-auto rounded-(--radius-card) bg-(--color-sunken) p-3">
               {thread.length === 0 ? (
-                <p className="py-6 text-center text-sm text-[--color-muted]">
+                <p className="py-6 text-center text-sm text-(--color-muted)">
                   Empty chat. Send a receipt above to start the conversation.
                 </p>
               ) : (
@@ -172,21 +171,21 @@ export default function Simulator({ session, goTo }) {
                     className={message.direction === 'OUT' ? 'flex justify-end' : 'flex justify-start'}
                   >
                     <div
-                      className={`max-w-[80%] rounded-[--radius-card] px-3 py-2 text-sm text-[--color-ink] ${
+                      className={`max-w-[80%] rounded-(--radius-card) px-3 py-2 text-sm text-(--color-ink) ${
                         message.direction === 'OUT'
-                          ? 'bg-[--color-good-soft]'
-                          : 'border border-[--color-line] bg-[--color-surface]'
+                          ? 'bg-(--color-good-soft)'
+                          : 'border border-(--color-line) bg-(--color-surface)'
                       }`}
                     >
                       {message.media_url && (
                         <img
                           src={message.media_url}
                           alt="Receipt sent on WhatsApp"
-                          className="mb-2 max-h-56 rounded-[--radius-inner] border border-[--color-line]"
+                          className="mb-2 max-h-56 rounded-(--radius-inner) border border-(--color-line)"
                         />
                       )}
                       {message.text && <p className="whitespace-pre-wrap">{message.text}</p>}
-                      <p className="mt-1 text-right text-xs text-[--color-muted]">
+                      <p className="mt-1 text-right text-xs text-(--color-muted)">
                         {clock(message.received_at)}
                       </p>
                     </div>
@@ -210,7 +209,7 @@ export default function Simulator({ session, goTo }) {
                     <Badge tone="brand">{result.requested_approver_role} must approve</Badge>
                   )}
                 </div>
-                <p className="text-sm text-[--color-muted]">
+                <p className="text-sm text-(--color-muted)">
                   {result.proposal_id
                     ? 'Orbit has written a proposal and recorded nothing. A human decides what happens next.'
                     : 'Orbit did not raise a proposal for that message. Nothing was recorded.'}
@@ -220,10 +219,10 @@ export default function Simulator({ session, goTo }) {
                 </Button>
               </div>
             ) : (
-              <ol className="space-y-3 text-sm text-[--color-muted]">
+              <ol className="space-y-3 text-sm text-(--color-muted)">
                 {STEPS.map((step, index) => (
                   <li key={step} className="flex gap-3">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[--color-brand-soft] text-xs font-semibold text-[--color-brand]">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-(--color-brand-soft) text-xs font-semibold text-(--color-brand)">
                       {index + 1}
                     </span>
                     <span>{step}</span>

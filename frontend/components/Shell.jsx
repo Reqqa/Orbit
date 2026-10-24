@@ -66,13 +66,13 @@ export default function Shell({ children }) {
   if (error) {
     return (
       <main className="mx-auto max-w-xl px-4 py-16">
-        <div className="rounded-[--radius-panel] bg-[--color-surface] p-8">
+        <div className="rounded-(--radius-panel) bg-(--color-surface) p-8">
           <h1 className="mb-3 text-lg font-semibold">Orbit cannot reach its API</h1>
           <ErrorNote error={error} onRetry={loadSession} />
-          <p className="mt-4 text-sm text-[--color-muted]">
+          <p className="mt-4 text-sm text-(--color-muted)">
             Start the Python backend and seed the demo data:
           </p>
-          <pre className="mt-2 overflow-x-auto rounded-[--radius-inner] bg-[--color-sunken] px-4 py-3 text-xs">
+          <pre className="mt-2 overflow-x-auto rounded-(--radius-inner) bg-(--color-sunken) px-4 py-3 text-xs">
             cd backend{'\n'}python -m seed.generate_data --reset{'\n'}python -m seed.generate_receipts{'\n'}uvicorn app.main:app --reload
           </pre>
         </div>
@@ -98,12 +98,12 @@ export default function Shell({ children }) {
             on a phone so no screen becomes unreachable. */}
         <nav
           aria-label="Screens"
-          className="sticky top-4 hidden h-[calc(100vh-2rem)] w-16 shrink-0 flex-col items-center gap-1 rounded-[--radius-panel] bg-[--color-rail] py-4 sm:flex"
+          className="sticky top-4 hidden h-[calc(100vh-2rem)] w-16 shrink-0 flex-col items-center gap-1 rounded-(--radius-panel) bg-(--color-rail) py-4 sm:flex"
         >
           <Link
             href="/today"
             aria-label="Orbit home"
-            className="mb-3 flex h-10 w-10 items-center justify-center rounded-[--radius-inner] bg-[--color-accent] text-lg font-semibold text-[--color-ink]"
+            className="mb-3 flex h-10 w-10 items-center justify-center rounded-(--radius-inner) bg-(--color-accent) text-lg font-semibold text-(--color-ink)"
           >
             O
           </Link>
@@ -115,9 +115,9 @@ export default function Shell({ children }) {
               title={item.label}
               aria-label={item.label}
               aria-current={current === item.key ? 'page' : undefined}
-              className={`flex h-10 w-10 items-center justify-center rounded-[--radius-inner] text-base transition ${
+              className={`flex h-10 w-10 items-center justify-center rounded-(--radius-inner) text-base transition ${
                 current === item.key
-                  ? 'bg-white text-[--color-ink]'
+                  ? 'bg-white text-(--color-ink)'
                   : 'text-white/55 hover:bg-white/10 hover:text-white'
               }`}
             >
@@ -136,18 +136,18 @@ export default function Shell({ children }) {
         </nav>
 
         <div className="min-w-0 flex-1">
-          <div className="rounded-[--radius-panel] bg-[--color-surface] p-5 sm:p-7">
+          <div className="rounded-(--radius-panel) bg-(--color-surface) p-5 sm:p-7">
             {/* Heading row: oversized title, with the role switcher kept at the
                 top right exactly where the reference puts its primary action. */}
             <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0">
                 <h1 className="display">{screen.title}</h1>
-                <p className="mt-2 text-sm text-[--color-muted]">{screen.lead}</p>
+                <p className="mt-2 text-sm text-(--color-muted)">{screen.lead}</p>
               </div>
 
               {session && (
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="hidden text-xs text-[--color-muted] sm:inline">
+                  <span className="hidden text-xs text-(--color-muted) sm:inline">
                     {session.tenant_name}
                   </span>
                   <Badge tone="brand">{session.role}</Badge>
@@ -156,7 +156,7 @@ export default function Shell({ children }) {
                     aria-label="Switch user"
                     value={session.user_id}
                     onChange={(event) => switchUser(event.target.value)}
-                    className="rounded-full border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm"
+                    className="rounded-full border border-(--color-line) bg-(--color-surface) px-3 py-2 text-sm"
                   >
                     {users.map((user) => (
                       <option key={user.user_id} value={user.user_id}>
@@ -176,8 +176,8 @@ export default function Shell({ children }) {
                   href={`/${item.key}`}
                   className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-2 text-sm transition ${
                     current === item.key
-                      ? 'bg-[--color-rail] font-medium text-white'
-                      : 'bg-[--color-sunken] text-[--color-muted]'
+                      ? 'bg-(--color-rail) font-medium text-white'
+                      : 'bg-(--color-sunken) text-(--color-muted)'
                   }`}
                 >
                   <span aria-hidden="true">{item.glyph}</span>
@@ -189,7 +189,7 @@ export default function Shell({ children }) {
             {session ? children : <Loading what="Starting Orbit" />}
           </div>
 
-          <footer className="px-5 py-5 text-xs text-[--color-muted]">
+          <footer className="px-5 py-5 text-xs text-(--color-muted)">
             <span className="inline-flex items-center gap-2">
               <IconChip tone="neutral" className="h-6 w-6 text-xs">
                 i

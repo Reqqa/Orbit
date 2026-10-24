@@ -7,13 +7,13 @@
 
 export function Card({ title, action, children, className = '', tone = 'surface' }) {
   const surface = {
-    surface: 'bg-[--color-surface] border-[--color-line]',
-    accent: 'bg-[--color-accent] border-transparent',
-    ink: 'bg-[--color-rail] border-transparent text-white',
+    surface: 'bg-(--color-surface) border-(--color-line)',
+    accent: 'bg-(--color-accent) border-transparent',
+    ink: 'bg-(--color-rail) border-transparent text-white',
   }[tone]
 
   return (
-    <section className={`rounded-[--radius-card] border ${surface} ${className}`}>
+    <section className={`rounded-(--radius-card) border ${surface} ${className}`}>
       {(title || action) && (
         <header className="flex items-center justify-between gap-3 px-5 pt-5 pb-3">
           <h2 className="text-sm font-semibold">{title}</h2>
@@ -27,11 +27,11 @@ export function Card({ title, action, children, className = '', tone = 'surface'
 
 export function Button({ variant = 'default', className = '', ...props }) {
   const styles = {
-    primary: 'bg-[--color-rail] text-white hover:opacity-90',
-    default: 'border border-[--color-line] bg-[--color-surface] hover:bg-[--color-sunken]',
-    good: 'bg-[--color-good] text-white hover:opacity-90',
-    danger: 'border border-[--color-bad] text-[--color-bad] hover:bg-[--color-bad-soft]',
-    ghost: 'text-[--color-brand] hover:bg-[--color-brand-soft]',
+    primary: 'bg-(--color-rail) text-white hover:opacity-90',
+    default: 'border border-(--color-line) bg-(--color-surface) hover:bg-(--color-sunken)',
+    good: 'bg-(--color-good) text-white hover:opacity-90',
+    danger: 'border border-(--color-bad) text-(--color-bad) hover:bg-(--color-bad-soft)',
+    ghost: 'text-(--color-brand) hover:bg-(--color-brand-soft)',
   }[variant]
 
   return (
@@ -43,11 +43,11 @@ export function Button({ variant = 'default', className = '', ...props }) {
 }
 
 const TONES = {
-  neutral: 'bg-[--color-sunken] text-[--color-muted] border-[--color-line]',
-  brand: 'bg-[--color-brand-soft] text-[--color-accent-deep] border-transparent',
-  good: 'bg-[--color-good-soft] text-[--color-good] border-transparent',
-  warn: 'bg-[--color-warn-soft] text-[--color-warn] border-transparent',
-  bad: 'bg-[--color-bad-soft] text-[--color-bad] border-transparent',
+  neutral: 'bg-(--color-sunken) text-(--color-muted) border-(--color-line)',
+  brand: 'bg-(--color-brand-soft) text-(--color-accent-deep) border-transparent',
+  good: 'bg-(--color-good-soft) text-(--color-good) border-transparent',
+  warn: 'bg-(--color-warn-soft) text-(--color-warn) border-transparent',
+  bad: 'bg-(--color-bad-soft) text-(--color-bad) border-transparent',
 }
 
 export function Badge({ tone = 'neutral', children, className = '' }) {
@@ -95,15 +95,15 @@ export function humanise(value) {
 /** A small rounded tile holding an icon or glyph, as on every card header. */
 export function IconChip({ children, tone = 'neutral', className = '' }) {
   const styles = {
-    neutral: 'bg-[--color-sunken] text-[--color-muted]',
-    brand: 'bg-[--color-brand-soft] text-[--color-accent-deep]',
-    ink: 'bg-[--color-rail] text-white',
-    plain: 'bg-white/70 text-[--color-ink]',
+    neutral: 'bg-(--color-sunken) text-(--color-muted)',
+    brand: 'bg-(--color-brand-soft) text-(--color-accent-deep)',
+    ink: 'bg-(--color-rail) text-white',
+    plain: 'bg-white/70 text-(--color-ink)',
   }[tone]
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[--radius-inner] text-sm ${styles} ${className}`}
+      className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-(--radius-inner) text-sm ${styles} ${className}`}
     >
       {children}
     </span>
@@ -182,12 +182,12 @@ export function StatCard({ icon, label, value, of, ring, meter, hint, tone = 'su
 
       <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="hero-number tabular">{value}</span>
-        {of && <span className="text-sm text-[--color-muted] tabular">/ {of}</span>}
+        {of && <span className="text-sm text-(--color-muted) tabular">/ {of}</span>}
         {ring != null && <Ring value={ring} label={label} />}
       </div>
 
       {meter}
-      {hint && <p className="mt-3 text-sm text-[--color-muted]">{hint}</p>}
+      {hint && <p className="mt-3 text-sm text-(--color-muted)">{hint}</p>}
     </Card>
   )
 }
@@ -202,7 +202,7 @@ export function CapsuleChart({ items, max, legend }) {
   return (
     <figure className="m-0">
       {legend && (
-        <figcaption className="mb-4 flex flex-wrap items-center gap-4 text-xs text-[--color-muted]">
+        <figcaption className="mb-4 flex flex-wrap items-center gap-4 text-xs text-(--color-muted)">
           {legend.map((entry) => (
             <span key={entry.label} className="inline-flex items-center gap-1.5">
               <span
@@ -222,7 +222,7 @@ export function CapsuleChart({ items, max, legend }) {
           return (
             <div key={item.label} className="flex min-w-14 flex-1 flex-col items-center gap-2">
               <span className="text-xs font-medium tabular">{item.display ?? item.value}</span>
-              <div className="relative flex h-40 w-9 items-end justify-center rounded-full bg-[--color-sunken]">
+              <div className="relative flex h-40 w-9 items-end justify-center rounded-full bg-(--color-sunken)">
                 <div
                   className="flex w-9 items-start justify-center rounded-full pt-1.5"
                   style={{ height: `${height}%`, background: item.color }}
@@ -233,7 +233,7 @@ export function CapsuleChart({ items, max, legend }) {
                   />
                 </div>
               </div>
-              <span className="text-center text-xs text-[--color-muted]">{item.label}</span>
+              <span className="text-center text-xs text-(--color-muted)">{item.label}</span>
             </div>
           )
         })}
@@ -249,7 +249,7 @@ export function Table({ columns, rows, renderRow, empty, onRowClick }) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-xs uppercase tracking-wide text-[--color-muted]">
+          <tr className="text-left text-xs uppercase tracking-wide text-(--color-muted)">
             {columns.map((column) => (
               <th key={column} className="py-2 pr-4 font-medium whitespace-nowrap">
                 {column}
@@ -262,8 +262,8 @@ export function Table({ columns, rows, renderRow, empty, onRowClick }) {
             <tr
               key={row.id ?? index}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
-              className={`border-t border-[--color-line] ${
-                onRowClick ? 'cursor-pointer hover:bg-[--color-sunken]' : ''
+              className={`border-t border-(--color-line) ${
+                onRowClick ? 'cursor-pointer hover:bg-(--color-sunken)' : ''
               }`}
             >
               {renderRow(row)}
@@ -281,20 +281,20 @@ export function Cell({ children, className = '' }) {
 
 export function Empty({ children }) {
   return (
-    <p className="rounded-[--radius-inner] bg-[--color-sunken] px-4 py-10 text-center text-sm text-[--color-muted]">
+    <p className="rounded-(--radius-inner) bg-(--color-sunken) px-4 py-10 text-center text-sm text-(--color-muted)">
       {children || 'Nothing here yet.'}
     </p>
   )
 }
 
 export function Loading({ what = 'Loading' }) {
-  return <p className="px-1 py-8 text-sm text-[--color-muted]">{what}…</p>
+  return <p className="px-1 py-8 text-sm text-(--color-muted)">{what}…</p>
 }
 
 export function ErrorNote({ error, onRetry }) {
   if (!error) return null
   return (
-    <div className="flex items-center justify-between gap-3 rounded-[--radius-inner] bg-[--color-bad-soft] px-4 py-3 text-sm text-[--color-bad]">
+    <div className="flex items-center justify-between gap-3 rounded-(--radius-inner) bg-(--color-bad-soft) px-4 py-3 text-sm text-(--color-bad)">
       <span>{error.message || String(error)}</span>
       {onRetry && (
         <Button variant="ghost" onClick={onRetry}>
@@ -309,7 +309,7 @@ export function ErrorNote({ error, onRetry }) {
 // never dismissible: honesty about what is real is part of the product.
 export function SimulatedNote({ children }) {
   return (
-    <p className="rounded-full bg-[--color-warn-soft] px-3.5 py-1.5 text-xs text-[--color-warn]">
+    <p className="rounded-full bg-(--color-warn-soft) px-3.5 py-1.5 text-xs text-(--color-warn)">
       {children}
     </p>
   )
@@ -331,8 +331,8 @@ export function Pills({ options, value, onChange, ariaLabel = 'Filter' }) {
             onClick={() => onChange(key)}
             className={`whitespace-nowrap rounded-full px-4 py-2 text-sm transition ${
               active
-                ? 'bg-[--color-rail] font-medium text-white'
-                : 'text-[--color-muted] hover:bg-[--color-sunken]'
+                ? 'bg-(--color-rail) font-medium text-white'
+                : 'text-(--color-muted) hover:bg-(--color-sunken)'
             }`}
           >
             {label}

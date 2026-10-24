@@ -8,12 +8,12 @@ const LOW = 0.7
 
 function Field({ label, value, confidence }) {
   return (
-    <div className="flex flex-wrap items-baseline gap-x-2 border-b border-[--color-line] py-1.5 last:border-0">
-      <dt className="w-40 shrink-0 text-xs uppercase tracking-wide text-[--color-muted]">{label}</dt>
+    <div className="flex flex-wrap items-baseline gap-x-2 border-b border-(--color-line) py-1.5 last:border-0">
+      <dt className="w-40 shrink-0 text-xs uppercase tracking-wide text-(--color-muted)">{label}</dt>
       <dd className="text-sm">
-        {value || <span className="text-[--color-muted]">not found</span>}
+        {value || <span className="text-(--color-muted)">not found</span>}
         {confidence != null && confidence < LOW && (
-          <span className="ml-2 rounded-full bg-[--color-warn-soft] px-2 py-0.5 text-[11px] font-medium text-[--color-warn]">
+          <span className="ml-2 rounded-full bg-(--color-warn-soft) px-2 py-0.5 text-[11px] font-medium text-(--color-warn)">
             please check
           </span>
         )}
@@ -72,10 +72,10 @@ function ApprovalCard({ item, canApprove, onDone }) {
             <img
               src={item.media_url}
               alt="Payment receipt as received on WhatsApp"
-              className="w-full rounded-[--radius-inner] border border-[--color-line] bg-[--color-sunken] object-contain"
+              className="w-full rounded-(--radius-inner) border border-(--color-line) bg-(--color-sunken) object-contain"
             />
           ) : (
-            <div className="flex h-56 items-center justify-center rounded-[--radius-inner] border border-dashed border-[--color-line] bg-[--color-sunken] px-4 text-center text-sm text-[--color-muted]">
+            <div className="flex h-56 items-center justify-center rounded-(--radius-inner) border border-dashed border-(--color-line) bg-(--color-sunken) px-4 text-center text-sm text-(--color-muted)">
               No image came with this message.
             </div>
           )}
@@ -86,20 +86,20 @@ function ApprovalCard({ item, canApprove, onDone }) {
 
         <div className="space-y-5">
           <div>
-            <p className="text-sm text-[--color-muted]">
+            <p className="text-sm text-(--color-muted)">
               {item.customer?.name || 'Unknown sender'} · suggests {top?.invoice_no || 'no invoice'}
             </p>
             <p className="mt-1 text-4xl font-semibold tracking-tight tabular">{item.amount_display}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <Badge tone={toneFor(item.classification)}>{humanise(item.classification)}</Badge>
-              <span className="text-xs text-[--color-muted]">
+              <span className="text-xs text-(--color-muted)">
                 needs {humanise(item.requested_approver_role)}
               </span>
             </div>
           </div>
 
           <div>
-            <div className="mb-1 flex items-baseline justify-between text-xs text-[--color-muted]">
+            <div className="mb-1 flex items-baseline justify-between text-xs text-(--color-muted)">
               <span>{story.confidence_label || 'Confidence'}</span>
               <span className="tabular">{Math.round(item.confidence ?? 0)}%</span>
             </div>
@@ -108,16 +108,16 @@ function ApprovalCard({ item, canApprove, onDone }) {
 
           <div>
             <h3 className="text-sm font-semibold">Why we think so</h3>
-            {story.headline && <p className="mt-1 text-sm text-[--color-muted]">{story.headline}</p>}
+            {story.headline && <p className="mt-1 text-sm text-(--color-muted)">{story.headline}</p>}
             <ul className="mt-2 space-y-1 text-sm">
               {(story.matched || []).map((line, i) => (
                 <li key={`m${i}`} className="flex gap-2">
-                  <span className="text-[--color-good]">✓</span>
+                  <span className="text-(--color-good)">✓</span>
                   <span>{line}</span>
                 </li>
               ))}
               {(story.missing || []).map((line, i) => (
-                <li key={`x${i}`} className="flex gap-2 text-[--color-warn]">
+                <li key={`x${i}`} className="flex gap-2 text-(--color-warn)">
                   <span aria-hidden="true">!</span>
                   <span>Please confirm: {line}</span>
                 </li>
@@ -136,7 +136,7 @@ function ApprovalCard({ item, canApprove, onDone }) {
           </dl>
 
           {story.next_step && <p className="text-sm font-medium">{story.next_step}</p>}
-          <p className="text-xs text-[--color-muted]">Read by {item.model_name || 'the extractor'}.</p>
+          <p className="text-xs text-(--color-muted)">Read by {item.model_name || 'the extractor'}.</p>
 
           {err && <ErrorNote error={err} />}
 
@@ -157,14 +157,14 @@ function ApprovalCard({ item, canApprove, onDone }) {
           </div>
 
           {!canApprove && (
-            <p className="text-xs text-[--color-muted]">
+            <p className="text-xs text-(--color-muted)">
               Your role cannot approve payments. The buttons stay here so you can see what the
               server says, and the attempt is written to the audit log.
             </p>
           )}
 
           {mode === 'reject' && (
-            <div className="space-y-2 rounded-[--radius-inner] border border-[--color-line] bg-[--color-sunken] p-3">
+            <div className="space-y-2 rounded-(--radius-inner) border border-(--color-line) bg-(--color-sunken) p-3">
               <label className="block text-xs font-medium" htmlFor={`reject-${item.id}`}>
                 Why are you rejecting this? Required.
               </label>
@@ -173,7 +173,7 @@ function ApprovalCard({ item, canApprove, onDone }) {
                 rows={2}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                className="w-full rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm"
+                className="w-full rounded-(--radius-inner) border border-(--color-line) bg-(--color-surface) px-3 py-2 text-sm"
                 placeholder="Receipt belongs to an older invoice"
               />
               <Button
@@ -187,7 +187,7 @@ function ApprovalCard({ item, canApprove, onDone }) {
           )}
 
           {mode === 'edit' && (
-            <div className="space-y-3 rounded-[--radius-inner] border border-[--color-line] bg-[--color-sunken] p-3">
+            <div className="space-y-3 rounded-(--radius-inner) border border-(--color-line) bg-(--color-sunken) p-3">
               <div>
                 <label className="block text-xs font-medium" htmlFor={`amount-${item.id}`}>
                   Correct amount in ringgit
@@ -198,7 +198,7 @@ function ApprovalCard({ item, canApprove, onDone }) {
                   onChange={(e) => setAmount(e.target.value)}
                   inputMode="decimal"
                   placeholder="850.00"
-                  className="mt-1 w-40 rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm tabular"
+                  className="mt-1 w-40 rounded-(--radius-inner) border border-(--color-line) bg-(--color-surface) px-3 py-2 text-sm tabular"
                 />
               </div>
               <div>
@@ -209,7 +209,7 @@ function ApprovalCard({ item, canApprove, onDone }) {
                   id={`invoice-${item.id}`}
                   value={invoiceId}
                   onChange={(e) => setInvoiceId(e.target.value)}
-                  className="mt-1 w-full rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-(--radius-inner) border border-(--color-line) bg-(--color-surface) px-3 py-2 text-sm"
                 >
                   {(item.candidates || []).map((c) => (
                     <option key={c.invoice_id} value={c.invoice_id}>
@@ -252,8 +252,7 @@ export default function Approvals({ session, canApprove, goTo, refresh }) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">Needs your approval</h1>
-        <p className="mt-1 text-sm text-[--color-muted]">
+        <p className="mt-1 text-sm text-(--color-muted)">
           {items.length === 0
             ? 'Every receipt has been dealt with.'
             : `${items.length} receipt${items.length === 1 ? '' : 's'} read and waiting on a human. Nothing is recorded until you decide.`}
@@ -265,7 +264,7 @@ export default function Approvals({ session, canApprove, goTo, refresh }) {
         <Card>
           <div className="px-2 py-10 text-center">
             <p className="text-base font-medium">Nothing waiting for you.</p>
-            <p className="mx-auto mt-2 max-w-md text-sm text-[--color-muted]">
+            <p className="mx-auto mt-2 max-w-md text-sm text-(--color-muted)">
               Send a receipt from the WhatsApp simulator and it will land here within seconds.
             </p>
             <div className="mt-4">

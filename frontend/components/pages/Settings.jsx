@@ -6,12 +6,12 @@ import { Button, Card, ErrorNote, Loading, SimulatedNote, humanise } from '../ui
 
 const LIMIT_KEY = 'finance_approval_limit_sen'
 const inputBase =
-  'w-full rounded-[--radius-inner] border border-[--color-line] bg-white px-3 py-2 text-sm disabled:bg-[--color-sunken] disabled:text-[--color-muted]'
+  'w-full rounded-(--radius-inner) border border-(--color-line) bg-white px-3 py-2 text-sm disabled:bg-(--color-sunken) disabled:text-(--color-muted)'
 
 function Fact({ label, children }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-wide text-[--color-muted]">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-(--color-muted)">{label}</p>
       <p className="mt-1 text-base font-medium">{children || '—'}</p>
     </div>
   )
@@ -31,11 +31,11 @@ function Field({ name, value, disabled, onChange }) {
         </label>
         <pre
           id={id}
-          className="mt-2 max-h-64 overflow-auto rounded-[--radius-inner] border border-[--color-line] bg-[--color-sunken] p-3 text-xs leading-relaxed"
+          className="mt-2 max-h-64 overflow-auto rounded-(--radius-inner) border border-(--color-line) bg-(--color-sunken) p-3 text-xs leading-relaxed"
         >
           {JSON.stringify(value, null, 2)}
         </pre>
-        <p className="mt-1.5 text-xs text-[--color-muted]">
+        <p className="mt-1.5 text-xs text-(--color-muted)">
           Nested configuration is edited as JSON. This block is shown read-only here and saved
           back unchanged.
         </p>
@@ -52,7 +52,7 @@ function Field({ name, value, disabled, onChange }) {
           checked={value}
           disabled={disabled}
           onChange={(event) => onChange(name, event.target.checked)}
-          className="h-4 w-4 rounded border-[--color-line]"
+          className="h-4 w-4 rounded border-(--color-line)"
         />
         {label}
       </label>
@@ -139,14 +139,13 @@ export default function Settings({ session, refresh }) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="mt-2 text-sm text-[--color-muted]">
+        <p className="mt-2 text-sm text-(--color-muted)">
           How Orbit matches receipts, chases customers and decides who may approve a payment.
         </p>
       </div>
 
       {!editable && (
-        <p className="rounded-[--radius-inner] border border-[--color-warn] bg-[--color-warn-soft] px-4 py-3 text-sm text-[--color-warn]">
+        <p className="rounded-(--radius-inner) border border-(--color-warn) bg-(--color-warn-soft) px-4 py-3 text-sm text-(--color-warn)">
           Only the Owner can change settings. You are signed in as {humanise(session.role)}, so
           everything below is read-only.
         </p>
@@ -170,7 +169,7 @@ export default function Settings({ session, refresh }) {
           Most a Finance user may approve, in ringgit
         </label>
         <div className="mt-2 flex max-w-xs items-center gap-2">
-          <span className="text-sm text-[--color-muted]">RM</span>
+          <span className="text-sm text-(--color-muted)">RM</span>
           <input
             id="limit"
             type="number"
@@ -185,7 +184,7 @@ export default function Settings({ session, refresh }) {
             className={inputBase}
           />
         </div>
-        <p className="mt-3 text-sm text-[--color-muted]">
+        <p className="mt-3 text-sm text-(--color-muted)">
           Lowering this changes who may approve the next payment immediately: anything above the
           limit goes to the Owner instead. Your own limit right now is{' '}
           {session.approval_limit_display}.
@@ -194,7 +193,7 @@ export default function Settings({ session, refresh }) {
 
       <Card title="Tenant configuration">
         {keys.length === 0 ? (
-          <p className="rounded-[--radius-inner] border border-dashed border-[--color-line] px-4 py-8 text-center text-sm text-[--color-muted]">
+          <p className="rounded-(--radius-inner) border border-dashed border-(--color-line) px-4 py-8 text-center text-sm text-(--color-muted)">
             This business has no saved configuration yet. Seed the demo data with{' '}
             <code>python -m seed.generate_data --reset</code> to get the match weights, confidence
             thresholds, chase ladder and quiet hours.
@@ -219,7 +218,7 @@ export default function Settings({ session, refresh }) {
           {saving ? 'Saving…' : 'Save settings'}
         </Button>
         {saved && (
-          <p className="text-sm text-[--color-good]">
+          <p className="text-sm text-(--color-good)">
             Saved {saved.count} setting{saved.count === 1 ? '' : 's'} and a Finance approval limit
             of {saved.sen} sen.
           </p>

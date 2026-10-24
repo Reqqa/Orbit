@@ -119,7 +119,7 @@ export default function Today({ goTo }) {
               <p className="text-sm font-medium">
                 {pending === 0 ? 'Your inbox is clear' : `${pending} waiting for a decision`}
               </p>
-              <p className="text-sm text-[--color-muted]">
+              <p className="text-sm text-(--color-muted)">
                 Each one shows the receipt, the invoice it matched, and why.
               </p>
             </div>
@@ -142,7 +142,7 @@ export default function Today({ goTo }) {
             max={Math.max(1, ...statuses.map((s) => s.value))}
             legend={statuses.map((s) => ({ label: s.label, color: s.color }))}
           />
-          <p className="mt-4 text-sm text-[--color-muted]">
+          <p className="mt-4 text-sm text-(--color-muted)">
             {invoiceTotal} invoices in total for this business.
           </p>
         </Card>
@@ -160,16 +160,16 @@ export default function Today({ goTo }) {
               hint="Approvals where a person changed something first."
             />
             <div>
-              <dt className="text-sm text-[--color-muted]">Receipts processed</dt>
+              <dt className="text-sm text-(--color-muted)">Receipts processed</dt>
               <dd className="mt-1 text-2xl font-medium tabular">{kpis.receipts_processed}</dd>
             </div>
             <div>
-              <dt className="text-sm text-[--color-muted]">Still outstanding</dt>
+              <dt className="text-sm text-(--color-muted)">Still outstanding</dt>
               <dd className="mt-1 text-2xl font-medium tabular">{kpis.outstanding_display}</dd>
             </div>
           </dl>
 
-          <p className="mt-5 text-xs text-[--color-muted]">
+          <p className="mt-5 text-xs text-(--color-muted)">
             About {kpis.seconds_per_receipt_orbit} seconds per receipt, against an{' '}
             <strong className="font-medium">assumed</strong>{' '}
             {Math.round(kpis.seconds_per_receipt_manual_assumed / 60)} minute manual baseline.
@@ -190,13 +190,13 @@ function Rate({ label, pct, hint }) {
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3">
-        <dt className="text-sm text-[--color-muted]">{label}</dt>
+        <dt className="text-sm text-(--color-muted)">{label}</dt>
         <dd className="text-xl font-medium tabular">{value}%</dd>
       </div>
       <div className="mt-2">
         <Bar value={value} max={100} tone="brand" segments={10} label={label} />
       </div>
-      <p className="mt-2 text-xs text-[--color-muted]">{hint}</p>
+      <p className="mt-2 text-xs text-(--color-muted)">{hint}</p>
     </div>
   )
 }
