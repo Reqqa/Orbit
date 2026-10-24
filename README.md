@@ -179,13 +179,18 @@ the browser still sees a single origin. Open **http://localhost:3000**.
 
 ### The 60-second demo path
 
-1. **WhatsApp simulator** — pick a customer, upload any image from
-   `backend/seed/receipts/`, press Send. Watch the bot reply.
+1. **WhatsApp simulator** — as the Owner, pick **Chee Hwa Peng Mini Market**, attach
+   `backend/seed/receipts/001-exact-match.png`, press Send. Each receipt is labelled for
+   one customer, so match the two: this one pays INV-1003, RM 677.45.
 2. **Approvals** — the receipt is there with the image, the extracted fields, the
    suggested invoice, a confidence bar and a plain-language "why we think so".
-3. Switch the role dropdown to a **Sales** user and press Approve. You get a refusal,
-   and the attempt is written to the audit log.
-4. Switch back to **Owner**, press Approve. The invoice moves to PAID.
+3. Switch the role dropdown to **Ravi Chandran · SALES** and press Approve. You get a
+   refusal, and the attempt is written to the audit log. Sales only sees the customers
+   assigned to them, which is why step 1 uses one of Ravi's: a receipt from
+   `010-exact-match.png`'s customer would not be on his screen at all.
+4. Switch back to **Lim Wei Keong · OWNER**, press Approve. INV-1003 moves to PAID, and
+   the customer's thread in the simulator now shows the templated confirmation. Nothing
+   is sent to the customer before a person approves.
 5. **Ledger** — click the invoice to see its timeline.
 6. **Audit log** — press *Verify integrity*. Then tamper with a row and press it again:
 

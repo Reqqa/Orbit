@@ -4,10 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.auth.rbac import APPROVE_MATCH, has_perm
 from app.auth.session import Principal, current_principal, set_session_cookie
 from app.config import get_settings
 from app.db import get_session
-from app.models import Tenant, User
+from app.models import ROLE_OWNER, Tenant, User
 from app.money import fmt_sen
 
 router = APIRouter(prefix="/api", tags=["session"])
@@ -25,15 +26,22 @@ def read_session(
         "name": principal.name,
         "role": principal.role,
         "approval_limit_sen": principal.approval_limit_sen,
-        "approval_limit_display": (
-            "No limit" if not principal.approval_limit_sen else fmt_sen(principal.approval_limit_sen)
-        ),
+        "approval_limit_display": _limit_display(principal),
         "tenant_id": principal.tenant_id,
         "tenant_name": tenant.name if tenant else None,
         "tenant_whatsapp_number": tenant.whatsapp_number if tenant else None,
         "simulated_login": True,
         "demo_mode": get_settings().demo_mode,
     }
+
+
+def _limit_display(principal: Principal) -> str:
+    """The approval limit as a person reads it. A limit of 0 means different things by role."""
+    if principal.role == ROLE_OWNER:
+        return "No limit"
+    if not has_perm(principal.role, APPROVE_MATCH):
+        return "none, this role cannot approve payments"
+    return fmt_sen(principal.approval_limit_sen)
 
 
 @router.get("/session/users")
