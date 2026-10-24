@@ -10,6 +10,7 @@ is synthetic and is reseeded to the same starting state every time the app resta
 
 **Deliverables are all inside the the deliverables folder**
 Youtube Video Link : https://youtu.be/Pptg7rTTPZc
+Youtube Video Link (with subtitle): https://youtu.be/oLzOzDHE0Qs
 
 ---
 
