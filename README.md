@@ -8,6 +8,8 @@ Orbit is a module for the **Orbyte** business hub. Orbyte is the host platform; 
 **Live demo: <https://orbit-casimirchiong.replit.app>** — public, no login needed. All data
 is synthetic and is reseeded to the same starting state every time the app restarts.
 
+**Deliverables are all inside the the deliverables folder**
+
 ---
 
 ## The problem
