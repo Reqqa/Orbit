@@ -35,6 +35,18 @@ PORT="${PORT:-8000}"
 PY="${PYTHON:-python3}"
 command -v "$PY" >/dev/null 2>&1 || PY=python
 
+# Replit injects DATABASE_URL=postgresql://... whenever a Replit database is
+# attached to the App, and its Agent attaches one on import. Orbit is SQLite
+# only and ships no Postgres driver, so anything but a sqlite URL would crash
+# the seed step. Fall back to the SQLite file the rest of Orbit expects.
+case "${DATABASE_URL:-}" in
+  "" | sqlite:*) ;;
+  *)
+    echo "DATABASE_URL is ${DATABASE_URL%%:*}, but Orbit is SQLite only: using sqlite:///./orbit.db"
+    export DATABASE_URL="sqlite:///./orbit.db"
+    ;;
+esac
+
 log() { printf '\n== %s\n' "$*"; }
 
 # ---------------------------------------------------------------- 1. Python deps

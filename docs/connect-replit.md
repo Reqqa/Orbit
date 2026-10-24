@@ -43,6 +43,21 @@ step 7 with "python3: not found" or "npm: not found", that is this. Fix: open
 which writes the correct identifiers for you.
 Source: <https://docs.replit.com/references/project-setup/configuration.md>
 
+**Seen on a real import (2026-10-24):** the bare `python-3.12` / `nodejs-20` spellings
+work — the Shell reported Python 3.12.12 and Node 20.20. But the import immediately
+started Replit's Agent on a task called "Port imported Vercel app to Replit", which
+committed a "pnpm_workspace migration scaffold": it moved `frontend/` into
+`.migration-backup/`, added `artifacts/` and `lib/`, rewrote `.replit` to
+`modules = ["nodejs-24"]`, and attached a Replit PostgreSQL database. Stop that task
+the moment you see it, then in the Shell put the repo back:
+
+```bash
+git reset --hard origin/main && git clean -fd && rm -rf artifacts lib
+```
+
+The attached database stays behind and injects `DATABASE_URL`; step 22 covers why
+that is harmless now.
+
 ---
 
 ## B. Secrets
@@ -271,3 +286,9 @@ Source: <https://docs.replit.com/replit-workspace/workspace-features/secrets>
 **21. Changing `PHONE_HMAC_KEY` later invalidates every stored `phone_hmac`.** Since the
 boot script reseeds anyway, this fixes itself on the next restart — but don't rotate that
 key mid-demo.
+
+**22. Seed step fails with `No module named 'psycopg2'`.** A Replit PostgreSQL database
+is attached to the App, so Replit injects `DATABASE_URL=postgresql://...` and the
+`PG*` variables. Orbit is SQLite only and ships no Postgres driver. The boot script now
+replaces any non-sqlite `DATABASE_URL` with `sqlite:///./orbit.db` and says so in the
+console, so this only bites a checkout older than that fix: run `git pull` in the Shell.
