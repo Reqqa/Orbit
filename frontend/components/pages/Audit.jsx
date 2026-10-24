@@ -16,8 +16,8 @@ const ACTORS = [
 
 const ACTOR_STYLE = {
   AI: 'bg-[--color-brand-soft] text-[--color-brand]',
-  USER: 'bg-[--color-canvas] text-[--color-ink]',
-  SYSTEM: 'bg-[--color-canvas] text-[--color-muted]',
+  USER: 'bg-[--color-sunken] text-[--color-ink]',
+  SYSTEM: 'bg-[--color-sunken] text-[--color-muted]',
   CUSTOMER: 'bg-[--color-warn-soft] text-[--color-warn]',
 }
 
@@ -98,7 +98,7 @@ export default function Audit() {
           <a
             href={api.auditExportUrl}
             download
-            className="inline-flex items-center rounded-lg border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm font-medium hover:bg-[--color-canvas]"
+            className="inline-flex items-center rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm font-medium hover:bg-[--color-sunken]"
           >
             Export .jsonl
           </a>
@@ -106,7 +106,7 @@ export default function Audit() {
 
         {check && (
           <div
-            className={`mt-4 rounded-lg border p-4 ${
+            className={`mt-4 rounded-[--radius-inner] border p-4 ${
               check.ok
                 ? 'border-[--color-good] bg-[--color-good-soft]'
                 : 'border-[--color-bad] bg-[--color-bad-soft]'
@@ -138,17 +138,17 @@ export default function Audit() {
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder="Filter by action, person or entity"
-          className="w-full rounded-lg border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm sm:w-72"
+          className="w-full rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm sm:w-72"
         />
         {ACTORS.map((item) => (
           <button
             key={item.key || 'all'}
             onClick={() => setActor(item.key)}
             aria-pressed={actor === item.key}
-            className={`rounded-lg px-3 py-1.5 text-sm transition ${
+            className={`rounded-[--radius-inner] px-3 py-1.5 text-sm transition ${
               actor === item.key
                 ? 'bg-[--color-brand-soft] font-medium text-[--color-brand]'
-                : 'border border-[--color-line] bg-[--color-surface] text-[--color-muted] hover:bg-[--color-canvas]'
+                : 'border border-[--color-line] bg-[--color-surface] text-[--color-muted] hover:bg-[--color-sunken]'
             }`}
           >
             {item.label}
@@ -174,7 +174,7 @@ export default function Audit() {
       {rows && (
         <Card>
           {visible.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-[--color-line] px-4 py-8 text-center text-sm text-[--color-muted]">
+            <p className="rounded-[--radius-inner] border border-dashed border-[--color-line] px-4 py-8 text-center text-sm text-[--color-muted]">
               {needle || actor
                 ? 'Nothing matches this filter. Clear the text box or pick All.'
                 : 'The log is empty. Approve a receipt or run the chasing batch, then come back — every action writes a row here.'}
@@ -196,7 +196,7 @@ export default function Audit() {
                     <Fragment key={row.id}>
                       <tr
                         onClick={() => setOpenId(openId === row.id ? null : row.id)}
-                        className="cursor-pointer border-b border-[--color-line] hover:bg-[--color-canvas]"
+                        className="cursor-pointer border-b border-[--color-line] hover:bg-[--color-sunken]"
                       >
                         <Cell className="tabular whitespace-nowrap text-[--color-muted]">
                           {when(row.created_at)}
@@ -212,7 +212,7 @@ export default function Audit() {
                       </tr>
                       {openId === row.id && (
                         <tr className="border-b border-[--color-line]">
-                          <td colSpan={4} className="bg-[--color-canvas] px-4 py-4">
+                          <td colSpan={4} className="bg-[--color-sunken] px-4 py-4">
                             <p className="font-mono text-xs text-[--color-muted]">
                               hash_self {String(row.hash_self ?? '').slice(0, 12)}…
                             </p>
@@ -225,7 +225,7 @@ export default function Audit() {
                                   <p className="text-xs uppercase tracking-wide text-[--color-muted]">
                                     {label}
                                   </p>
-                                  <pre className="mt-1 overflow-x-auto rounded-lg border border-[--color-line] bg-[--color-surface] p-3 font-mono text-[11px] leading-relaxed">
+                                  <pre className="mt-1 overflow-x-auto rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] p-3 font-mono text-[11px] leading-relaxed">
                                     {value ?? '—'}
                                   </pre>
                                 </div>

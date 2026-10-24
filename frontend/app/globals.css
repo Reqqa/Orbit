@@ -1,20 +1,39 @@
 @import 'tailwindcss';
 
-/* Orbit uses one small set of tokens so every screen looks like the same product. */
+/* Orbit uses one small set of tokens so every screen looks like the same product.
+   Soft neutral canvas, floating white panels, near-black ink, one blue accent.
+   The names are stable: screens reference them, so a re-theme happens here. */
 @theme {
-  --color-ink: #0f172a;
-  --color-muted: #64748b;
-  --color-line: #e2e8f0;
-  --color-surface: #ffffff;
-  --color-canvas: #f6f8fb;
-  --color-brand: #1d4ed8;
-  --color-brand-soft: #eef3ff;
-  --color-good: #0f7b55;
-  --color-good-soft: #e6f6ef;
-  --color-warn: #a16207;
-  --color-warn-soft: #fef6e0;
+  /* Surfaces */
+  --color-canvas: #e7eaee; /* the page behind the panels */
+  --color-surface: #ffffff; /* panels and cards */
+  --color-sunken: #f4f6f9; /* wells inside a card */
+  --color-rail: #11161c; /* the dark navigation rail */
+
+  /* Ink */
+  --color-ink: #11161c;
+  --color-muted: #6b7280;
+  --color-line: #e8ecf1;
+
+  /* The single accent. --color-brand is for marks and text, where it must hold
+     3:1 on white; --color-accent is a large fill that carries ink text on top. */
+  --color-brand: #2563eb;
+  --color-brand-soft: #eaf1ff;
+  --color-accent: #9ecbff;
+  --color-accent-deep: #1d4ed8;
+
+  /* Status. Reserved: never reused as a series colour, always shipped with a label. */
+  --color-good: #15803d;
+  --color-good-soft: #e7f5ec;
+  --color-warn: #b45309;
+  --color-warn-soft: #fdf3e3;
   --color-bad: #b4231f;
   --color-bad-soft: #fdeceb;
+
+  /* The reference's signature: very round corners at every scale. */
+  --radius-panel: 32px;
+  --radius-card: 24px;
+  --radius-inner: 16px;
 }
 
 html,
@@ -32,7 +51,38 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Numbers in tables should line up. */
+/* Numbers in tables and stat tiles should line up. */
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* The oversized page heading, as in the reference. Tight tracking, light weight. */
+.display {
+  font-size: clamp(1.9rem, 4.2vw, 3.1rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+}
+
+/* A stat tile's hero number: large, light, never bold. */
+.hero-number {
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: 450;
+}
+
+/* Hide the scrollbar on the horizontal pill rows without losing the scroll. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

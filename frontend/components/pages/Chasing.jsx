@@ -31,7 +31,7 @@ function DraftCard({ draft, kept, onToggle, canApprove }) {
         </div>
       </div>
 
-      <blockquote className="mt-4 whitespace-pre-wrap rounded-lg border-l-4 border-[--color-brand] bg-[--color-canvas] px-4 py-3 text-sm">
+      <blockquote className="mt-4 whitespace-pre-wrap rounded-[--radius-inner] border-l-4 border-[--color-brand] bg-[--color-sunken] px-4 py-3 text-sm">
         {draft.body}
       </blockquote>
 
@@ -138,7 +138,7 @@ export default function Chasing({ session, canApprove, refresh }) {
       )}
       {err && <ErrorNote error={err} onRetry={load} />}
       {sentNote && (
-        <p className="rounded-lg border border-[--color-good] bg-[--color-good-soft] px-4 py-3 text-sm text-[--color-good]">
+        <p className="rounded-[--radius-inner] border border-[--color-good] bg-[--color-good-soft] px-4 py-3 text-sm text-[--color-good]">
           Sent {sentNote.sent} reminder{sentNote.sent === 1 ? '' : 's'}, skipped{' '}
           {sentNote.skipped}.{sentNote.simulated ? ' Simulated channel.' : ''}
         </p>
@@ -171,7 +171,7 @@ export default function Chasing({ session, canApprove, refresh }) {
       </div>
 
       {canApprove && drafts.length > 0 && (
-        <div className="sticky bottom-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[--color-line] bg-[--color-surface] px-4 py-3">
+        <div className="sticky bottom-4 flex flex-wrap items-center justify-between gap-3 rounded-[--radius-card] border border-[--color-line] bg-[--color-surface] px-4 py-3">
           <span className="text-sm text-[--color-muted]">
             {keptIds.length} kept · {skipped.length} skipped by hand
           </span>

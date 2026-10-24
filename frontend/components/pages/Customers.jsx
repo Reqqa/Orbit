@@ -85,7 +85,7 @@ export default function Customers() {
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search a name or nickname"
           aria-label="Search customers by name or alias"
-          className="w-full rounded-lg border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm sm:w-72"
+          className="w-full rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm sm:w-72"
         />
         <div className="flex items-center gap-2">
           <span className="text-xs uppercase tracking-wide text-[--color-muted]">Sort</span>
@@ -97,10 +97,10 @@ export default function Customers() {
               key={key}
               onClick={() => setSort(key)}
               aria-pressed={sort === key}
-              className={`rounded-lg px-3 py-1.5 text-sm transition ${
+              className={`rounded-[--radius-inner] px-3 py-1.5 text-sm transition ${
                 sort === key
                   ? 'bg-[--color-brand-soft] font-medium text-[--color-brand]'
-                  : 'border border-[--color-line] bg-[--color-surface] text-[--color-muted] hover:bg-[--color-canvas]'
+                  : 'border border-[--color-line] bg-[--color-surface] text-[--color-muted] hover:bg-[--color-sunken]'
               }`}
             >
               {label}

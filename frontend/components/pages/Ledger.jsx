@@ -105,7 +105,7 @@ export default function Ledger() {
                 ))}
               </ol>
             ) : (
-              <p className="rounded-lg border border-dashed border-[--color-line] px-4 py-8 text-center text-sm text-[--color-muted]">
+              <p className="rounded-[--radius-inner] border border-dashed border-[--color-line] px-4 py-8 text-center text-sm text-[--color-muted]">
                 Nothing has happened to this invoice since it was created. Send a reminder from
                 Chasing, or receive a receipt in the simulator.
               </p>
@@ -132,10 +132,10 @@ export default function Ledger() {
             key={item.key}
             onClick={() => setFilter(item.key)}
             aria-pressed={filter === item.key}
-            className={`rounded-lg px-3 py-1.5 text-sm transition ${
+            className={`rounded-[--radius-inner] px-3 py-1.5 text-sm transition ${
               filter === item.key
                 ? 'bg-[--color-brand-soft] font-medium text-[--color-brand]'
-                : 'border border-[--color-line] bg-[--color-surface] text-[--color-muted] hover:bg-[--color-canvas]'
+                : 'border border-[--color-line] bg-[--color-surface] text-[--color-muted] hover:bg-[--color-sunken]'
             }`}
           >
             {item.label}

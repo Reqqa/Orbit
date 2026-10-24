@@ -123,7 +123,7 @@ export default function Simulator({ session, goTo }) {
                 <select
                   value={customerId}
                   onChange={(event) => setCustomerId(event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-[--color-line] bg-white px-3 py-2 text-sm text-[--color-ink]"
+                  className="mt-1 w-full rounded-[--radius-inner] border border-[--color-line] bg-white px-3 py-2 text-sm text-[--color-ink]"
                 >
                   {customers.map((customer) => (
                     <option key={customer.id} value={customer.id}>
@@ -139,7 +139,7 @@ export default function Simulator({ session, goTo }) {
                   type="file"
                   accept="image/*"
                   onChange={pickFile}
-                  className="mt-1 w-full rounded-lg border border-[--color-line] bg-white px-3 py-2 text-sm text-[--color-ink]"
+                  className="mt-1 w-full rounded-[--radius-inner] border border-[--color-line] bg-white px-3 py-2 text-sm text-[--color-ink]"
                 />
               </label>
               {fileNote && <SimulatedNote>{fileNote}</SimulatedNote>}
@@ -150,7 +150,7 @@ export default function Simulator({ session, goTo }) {
                   value={text}
                   onChange={(event) => setText(event.target.value)}
                   placeholder="Paid already boss"
-                  className="mt-1 w-full rounded-lg border border-[--color-line] bg-white px-3 py-2 text-sm text-[--color-ink]"
+                  className="mt-1 w-full rounded-[--radius-inner] border border-[--color-line] bg-white px-3 py-2 text-sm text-[--color-ink]"
                 />
               </label>
 
@@ -160,7 +160,7 @@ export default function Simulator({ session, goTo }) {
               {sendError && <ErrorNote error={sendError} />}
             </form>
 
-            <div className="mt-4 max-h-96 space-y-3 overflow-y-auto rounded-xl bg-[--color-canvas] p-3">
+            <div className="mt-4 max-h-96 space-y-3 overflow-y-auto rounded-[--radius-card] bg-[--color-sunken] p-3">
               {thread.length === 0 ? (
                 <p className="py-6 text-center text-sm text-[--color-muted]">
                   Empty chat. Send a receipt above to start the conversation.
@@ -172,7 +172,7 @@ export default function Simulator({ session, goTo }) {
                     className={message.direction === 'OUT' ? 'flex justify-end' : 'flex justify-start'}
                   >
                     <div
-                      className={`max-w-[80%] rounded-xl px-3 py-2 text-sm text-[--color-ink] ${
+                      className={`max-w-[80%] rounded-[--radius-card] px-3 py-2 text-sm text-[--color-ink] ${
                         message.direction === 'OUT'
                           ? 'bg-[--color-good-soft]'
                           : 'border border-[--color-line] bg-[--color-surface]'
@@ -182,7 +182,7 @@ export default function Simulator({ session, goTo }) {
                         <img
                           src={message.media_url}
                           alt="Receipt sent on WhatsApp"
-                          className="mb-2 max-h-56 rounded-lg border border-[--color-line]"
+                          className="mb-2 max-h-56 rounded-[--radius-inner] border border-[--color-line]"
                         />
                       )}
                       {message.text && <p className="whitespace-pre-wrap">{message.text}</p>}

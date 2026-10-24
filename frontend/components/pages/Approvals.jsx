@@ -72,10 +72,10 @@ function ApprovalCard({ item, canApprove, onDone }) {
             <img
               src={item.media_url}
               alt="Payment receipt as received on WhatsApp"
-              className="w-full rounded-lg border border-[--color-line] bg-[--color-canvas] object-contain"
+              className="w-full rounded-[--radius-inner] border border-[--color-line] bg-[--color-sunken] object-contain"
             />
           ) : (
-            <div className="flex h-56 items-center justify-center rounded-lg border border-dashed border-[--color-line] bg-[--color-canvas] px-4 text-center text-sm text-[--color-muted]">
+            <div className="flex h-56 items-center justify-center rounded-[--radius-inner] border border-dashed border-[--color-line] bg-[--color-sunken] px-4 text-center text-sm text-[--color-muted]">
               No image came with this message.
             </div>
           )}
@@ -164,7 +164,7 @@ function ApprovalCard({ item, canApprove, onDone }) {
           )}
 
           {mode === 'reject' && (
-            <div className="space-y-2 rounded-lg border border-[--color-line] bg-[--color-canvas] p-3">
+            <div className="space-y-2 rounded-[--radius-inner] border border-[--color-line] bg-[--color-sunken] p-3">
               <label className="block text-xs font-medium" htmlFor={`reject-${item.id}`}>
                 Why are you rejecting this? Required.
               </label>
@@ -173,7 +173,7 @@ function ApprovalCard({ item, canApprove, onDone }) {
                 rows={2}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                className="w-full rounded-lg border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm"
+                className="w-full rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm"
                 placeholder="Receipt belongs to an older invoice"
               />
               <Button
@@ -187,7 +187,7 @@ function ApprovalCard({ item, canApprove, onDone }) {
           )}
 
           {mode === 'edit' && (
-            <div className="space-y-3 rounded-lg border border-[--color-line] bg-[--color-canvas] p-3">
+            <div className="space-y-3 rounded-[--radius-inner] border border-[--color-line] bg-[--color-sunken] p-3">
               <div>
                 <label className="block text-xs font-medium" htmlFor={`amount-${item.id}`}>
                   Correct amount in ringgit
@@ -198,7 +198,7 @@ function ApprovalCard({ item, canApprove, onDone }) {
                   onChange={(e) => setAmount(e.target.value)}
                   inputMode="decimal"
                   placeholder="850.00"
-                  className="mt-1 w-40 rounded-lg border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm tabular"
+                  className="mt-1 w-40 rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm tabular"
                 />
               </div>
               <div>
@@ -209,7 +209,7 @@ function ApprovalCard({ item, canApprove, onDone }) {
                   id={`invoice-${item.id}`}
                   value={invoiceId}
                   onChange={(e) => setInvoiceId(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-[--radius-inner] border border-[--color-line] bg-[--color-surface] px-3 py-2 text-sm"
                 >
                   {(item.candidates || []).map((c) => (
                     <option key={c.invoice_id} value={c.invoice_id}>
