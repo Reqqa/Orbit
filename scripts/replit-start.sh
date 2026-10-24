@@ -51,8 +51,12 @@ log() { printf '\n== %s\n' "$*"; }
 
 # ---------------------------------------------------------------- 1. Python deps
 # Idempotent: pip is a no-op when the requirements are already satisfied.
+# Replit's Python lives in the read-only Nix store and is marked
+# EXTERNALLY-MANAGED, so pip refuses to install (PEP 668) even though Replit's
+# own pip config sends user installs to .pythonlibs. Saying so explicitly is
+# safe there, and only there. pip itself is Nix-managed, so it is not upgraded.
 log "1/4 installing Python dependencies"
-"$PY" -m pip install --quiet --upgrade pip
+[ -n "${REPL_ID:-}" ] && export PIP_BREAK_SYSTEM_PACKAGES=1
 "$PY" -m pip install --quiet -r backend/requirements.txt
 
 # --------------------------------------------------- 2. database and demo data

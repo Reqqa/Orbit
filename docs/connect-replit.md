@@ -292,3 +292,9 @@ is attached to the App, so Replit injects `DATABASE_URL=postgresql://...` and th
 `PG*` variables. Orbit is SQLite only and ships no Postgres driver. The boot script now
 replaces any non-sqlite `DATABASE_URL` with `sqlite:///./orbit.db` and says so in the
 console, so this only bites a checkout older than that fix: run `git pull` in the Shell.
+
+**23. Step 1 fails with `error: externally-managed-environment`.** Replit's Python is in
+the read-only Nix store and marked EXTERNALLY-MANAGED (PEP 668), and pip 26 refuses to
+install even though Replit's pip config sends user installs to `.pythonlibs`. The boot
+script sets `PIP_BREAK_SYSTEM_PACKAGES=1` when `REPL_ID` is set — that is, on Replit
+only — and no longer tries to upgrade pip, which is Nix-managed too.
