@@ -1,0 +1,33 @@
+# Orbit, payment reconciliation for the Orbyte hub.
+# Replit configuration. The boot sequence itself lives in
+# scripts/replit-start.sh so it is readable and reviewable; this file only
+# points at it.
+#
+# UNVERIFIED: there is no Replit environment on the development machine, so
+# none of the keys below have been exercised by a real Repl. They follow the
+# current .replit format (modules, which supersede replit.nix, so no
+# replit.nix is committed).
+#
+# Secrets (SESSION_SECRET, PHONE_HMAC_KEY, PHONE_ENC_KEY, and ANTHROPIC_API_KEY
+# only if LLM_PROVIDER=claude) are set in the Replit Secrets pane. Nothing
+# here reads a committed .env. LLM_PROVIDER defaults to mock, which reads
+# labelled answers from seed/ground_truth.csv and makes no network call.
+
+entrypoint = "README.md"
+modules = ["python-3.12", "nodejs-20"]
+run = ["bash", "scripts/replit-start.sh"]
+
+[nix]
+channel = "stable-24_05"
+
+# One web process: FastAPI serves the exported dashboard at / and the API docs
+# at /docs on the same port, so a judge needs one URL.
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+[deployment]
+# "vm", not "autoscale": the demo keeps state in a local SQLite file and the
+# boot script seeds it, so it must be a single long-lived instance.
+deploymentTarget = "vm"
+run = ["bash", "scripts/replit-start.sh"]

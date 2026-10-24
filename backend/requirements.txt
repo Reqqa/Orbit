@@ -1,0 +1,27 @@
+# Kept deliberately short. Add a package only when a build step needs it.
+
+# Web layer
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+pydantic-settings>=2.6
+python-multipart>=0.0.12
+
+# Database. Pinned to the 2.0 line, which is what docs/SPEC.md targets.
+sqlalchemy>=2.0.36,<2.1
+
+# Phone number encryption (the lookup HMAC and cookie signing use the stdlib).
+cryptography>=43.0
+
+# Payer-name similarity in the match scorecard.
+rapidfuzz>=3.10
+
+# Generating the synthetic receipt images.
+pillow>=11.0
+
+# Claude vision for receipt extraction. Only imported when LLM_PROVIDER=claude,
+# so the mock path runs without it.
+anthropic>=1.0
+
+# Tests: matching, classification, RBAC, audit chain. Nothing else.
+pytest>=8.3

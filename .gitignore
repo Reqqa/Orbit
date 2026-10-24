@@ -1,0 +1,31 @@
+# Secrets and local config
+.env
+.env.local
+
+# Database
+*.db
+*.db-journal
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node / frontend
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+
+# Generated demo data (regenerate with the seed scripts)
+backend/seed/receipts/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Receipt images stored by the webhook and simulator (regenerate by re-sending).
+backend/media/

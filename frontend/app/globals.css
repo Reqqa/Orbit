@@ -1,0 +1,38 @@
+@import 'tailwindcss';
+
+/* Orbit uses one small set of tokens so every screen looks like the same product. */
+@theme {
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --color-line: #e2e8f0;
+  --color-surface: #ffffff;
+  --color-canvas: #f6f8fb;
+  --color-brand: #1d4ed8;
+  --color-brand-soft: #eef3ff;
+  --color-good: #0f7b55;
+  --color-good-soft: #e6f6ef;
+  --color-warn: #a16207;
+  --color-warn-soft: #fef6e0;
+  --color-bad: #b4231f;
+  --color-bad-soft: #fdeceb;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Numbers in tables should line up. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

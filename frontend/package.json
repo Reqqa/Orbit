@@ -1,0 +1,21 @@
+{
+  "name": "orbit-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Orbit dashboard. Next.js, static export, talks to the Python API.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "postcss": "^8.5.31",
+    "tailwindcss": "^4.3.3"
+  }
+}
