@@ -236,7 +236,13 @@ approve it; leave it sitting in the inbox.
 ### Sales is refused (3:15–3:28)
 
 **On screen.** Role switcher, top right, choose `Ravi Chandran · SALES · Sin Heng
-Hardware Trading`. The badge next to it changes to **SALES**. Go to `/approvals`. The
+Hardware Trading`. The badge next to it changes to **SALES**. Go to `/approvals`.
+
+> **Check before you record:** Sales sees only the customers assigned to them, so there
+> must be at least one pending card belonging to Ravi. `003-exact-match.png` (Khoo Boon
+> Hwa Mini Market) is one of his, which is why the duplicate from the previous segment is
+> still on his screen here. `010-exact-match.png` is not his and will be hidden — that is
+> the restricted view working, not a bug. The
 grey note under the buttons: *Your role cannot approve payments. The buttons stay here so
 you can see what the server says, and the attempt is written to the audit log.* Press
 **Approve** anyway. The error from the server appears and the card stays put. If the
@@ -245,7 +251,8 @@ browser devtools network tab is already open on a second monitor, show the **403
 **Presenter says.**
 
 > The login is simulated — there is no real identity provider here — but the permissions
-> are not. I am now Ravi, who is Sales. He can see the inbox. We deliberately leave the
+> are not. I am now Ravi, who is Sales. He sees a restricted inbox: only the customers
+> assigned to him, which is fewer cards than the Owner just saw. We deliberately leave the
 > Approve button on screen so you can watch the server refuse it. HTTP 403. The card does
 > not move, nothing is recorded, and the attempt itself is written to the audit log.
 

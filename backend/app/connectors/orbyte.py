@@ -2,8 +2,14 @@
 
 Orbit is positioned as an Orbyte app module: the company profile, users and roles,
 customer master data and invoices all belong to the Orbyte hub, and Orbit only adds
-the receivables workflow on top. Every piece of hub data in this codebase therefore
-goes through `OrbyteConnector`, and nothing else in Orbit talks to the hub directly.
+the receivables workflow on top.
+
+On the live path today: `list_open_invoices` and `list_customers` feed every match
+decision, and `record_payment` and `push_activity` run on every approval. The other
+three methods - `get_tenant`, `list_users` and `send_notification` - are implemented
+and exercised by `/api/orbyte/status` and `/preview`, but Orbit still reads tenant
+and user rows directly for the simulated login, because those are the platform
+foundations the brief says may be simulated.
 
 **The endpoints below are our own documented assumption, not a published contract.**
 Live Orbyte access was not available while building this MVP, and the brief allows us

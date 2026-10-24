@@ -44,8 +44,8 @@ it can serve many SMEs without each one setting up a custom system.
 
 | Criterion | Weight | What judges want | How Orbit hits it |
 |---|---|---|---|
-| Innovation & Creativity | 30% | Specific real pain point, original product, AI only where it adds value, not a re-skinned chatbot, not HR/admin | Pain point is concrete: "owner manually matches WhatsApp receipt screenshots to invoices and chases late payers every evening". AI is used for exactly one thing (reading messy receipt images and noisy messages). Matching, scoring, approval, chasing schedules are deterministic rules. This is a workflow product, not a chat UI. Finance/receivables is a new capability, not HR/admin. |
-| Problem-Solution Fit | 25% | Removes one recurring burden, accurate and consistent, easy to learn, people in control (permissions + approval + log), fits Orbyte hub, reusable, within boundaries | One burden: payment reconciliation + chasing. Role-based permissions (Owner / Finance staff / Sales staff). Approval gate before any consequential action. Activity log. Orbyte connector layer. Multi-tenant. Zero-training because owner approves inside WhatsApp itself. |
+| Innovation & Creativity | 30% | Specific real pain point, original product, AI only where it adds value, not a re-skinned chatbot, not HR/admin | Pain point is concrete: "owner manually matches WhatsApp receipt screenshots to invoices and chases late payers every evening". AI is used for exactly one thing (reading messy receipt images). Matching, scoring, approval, chasing schedules are deterministic rules. This is a workflow product, not a chat UI. Finance/receivables is a new capability, not HR/admin. |
+| Problem-Solution Fit | 25% | Removes one recurring burden, accurate and consistent, easy to learn, people in control (permissions + approval + log), fits Orbyte hub, reusable, within boundaries | One burden: payment reconciliation + chasing. Role-based permissions (Owner / Finance staff / Sales staff). Approval gate before any consequential action. Activity log. Orbyte connector layer. Multi-tenant. Approval is one tap on a screen with three buttons and a plain-language explanation. |
 | Feasibility of Build | 25% | Full journey live (trigger, data, decision, approval, outcome), GitHub repo, synthetic data, own API assumptions, names hardest risk with fallback, no dependency on live Orbyte | Journey runs live end to end. Built-in WhatsApp simulator means demo never depends on Meta approval. Mock Orbyte API we define ourselves. Risk register with fallbacks (Section 12). |
 | Clarity of Proposal | 20% | Problem, approach, expected outcome with measurable benefit, easy to explain back, follows format/length | One-sentence problem, five-step approach, quantified outcome (Section 11), simple diagram, template-compliant. |
 
@@ -97,7 +97,7 @@ the visible "people stay in control" feature.
  5 VISIBLE OUTCOME    <-  4 HUMAN APPROVAL  <-  Recommendation + explanation
  Invoice marked paid      Owner/Finance taps     "Matches INV-1042, RM 850.00,
  Ledger updated           Approve / Reject /     ref matches, name 96% similar,
- Customer notified        Edit in WhatsApp       confidence 94%"
+ Customer notified        Edit on dashboard      confidence 94%"
  Dashboard + audit log    or dashboard
 ```
 
@@ -109,7 +109,7 @@ the visible "people stay in control" feature.
 4. **Matching (rules, deterministic).** Score each open invoice of that customer (and, if customer unknown, of the tenant) using the weighted scorecard in Section 7. Output a ranked list.
 5. **Classification.** One of: `EXACT_MATCH`, `PARTIAL_PAYMENT`, `OVERPAYMENT`, `MULTI_INVOICE`, `DUPLICATE`, `UNMATCHED`, `LOW_CONFIDENCE`, `NOT_A_RECEIPT`.
 6. **Recommendation + explanation.** Template-generated explanation (not free LLM text) listing which signals matched and which are missing. Missing information is explicitly handed to a human ("Reference number not found, please confirm").
-7. **Approval request.** Owner/Finance receives a WhatsApp interactive message with buttons: **Approve / Reject / Review on dashboard**. The same item appears in the dashboard "Approval inbox". Role and amount limit checked server-side.
+7. **Approval request.** The item appears in the dashboard "Approval inbox" for the role that must decide it. *(Not built: a WhatsApp interactive message with Approve / Reject buttons sent to the owner. That is roadmap, and the pitch must not claim it.)* Role and amount limit checked server-side.
 8. **Outcome.** On approve (one DB transaction): create `payment` record, allocate to invoice(s), update invoice status (`PAID`, `PARTIAL`), update customer ledger balance, write audit entries; then send confirmation to customer ("Thanks Ahmad, RM 850.00 received for INV-1042"). On reject: ask customer for clarification, log reason.
 9. **Dashboard.** Live KPIs and tables update (Section 9).
 
@@ -328,9 +328,9 @@ Design rule: a new user should complete the core task in under 60 seconds with z
 8. **WhatsApp Simulator (demo mode).** A phone-style chat panel: pick a customer, upload a receipt, watch the bot reply; second panel shows the owner's phone with approval buttons. Clearly labelled "Simulated channel".
 9. **Role switcher (demo mode).** Top-right dropdown: Owner / Finance / Sales, to show permissions live. Sales sees a restricted view and gets "You don't have permission" if they attempt to approve (and the attempt is logged).
 
-**Ease-of-learning tactics (state these in the pitch):** approval happens inside WhatsApp, which the owner already uses; one-tap actions; plain-language explanations; empty states with guidance; BM/EN/ZH message templates; no setup wizard beyond uploading an invoice list (CSV) or connecting via Orbyte.
+**Ease-of-learning tactics (state these in the pitch):** one-tap actions; plain-language explanations; empty states with guidance; BM/EN/ZH message templates; no setup wizard beyond uploading an invoice list (CSV) or connecting via Orbyte.
 
-**KPI strip (proof of benefit, shown on dashboard):** receipts processed, average handling time (system vs estimated manual baseline), auto-match rate, human-correction rate, days sales outstanding (DSO) trend, reminders sent vs paid within 7 days.
+**KPI strip (shown on dashboard):** receipts processed, auto-match rate, human-correction rate, total outstanding. *(Returned by the API but not yet rendered: handling time against the assumed manual baseline. DSO trend and reminders-sent-vs-paid are roadmap.)*, days sales outstanding (DSO) trend, reminders sent vs paid within 7 days.
 
 ---
 
@@ -360,7 +360,7 @@ State these as **targets and assumptions** and back them with what we can measur
 |---|---|---|
 | Time per receipt (open chat, read, check, key in, reply) | 2-4 min | ~15-20 sec (one tap approval) |
 | Owner time on reconciliation + chasing per week | 4-8 hours (assumption) | ~1 hour (approvals only) |
-| Data entry errors (wrong invoice/amount) | Occurs regularly (unquantified) | Target: > 90% auto-match accuracy on test set, 100% human-confirmed before recording |
+| Data entry errors (wrong invoice/amount) | Occurs regularly (unquantified) | **Measured:** 47/50 (94%) classification accuracy and **0** confident wrong answers on the 50-receipt set; auto-match (score >= 90 on the right invoice) is 44%, because the set is deliberately awkward. 100% human-confirmed before recording. See `accuracy.md`. |
 | Overdue follow-up consistency | Ad hoc | 100% of overdue invoices touched per ladder, with approval |
 | Tasks completed without training | n/a | New user completes first approval in < 60 s (measure with 3-5 testers) |
 
@@ -595,7 +595,7 @@ Rules for the demo: use real running software, not mockups; label simulated part
 1. Trigger: customer sends receipt on WhatsApp.
 2. Connected data: open invoices, customer and role data from the Orbyte hub.
 3. Decision logic: AI reads the receipt; transparent rules score the match and classify exceptions.
-4. Human approval: the right role approves with one tap in WhatsApp or dashboard; limits by role.
+4. Human approval: the right role approves with one tap in the dashboard; limits by role, enforced server-side.
 5. Visible outcome: payment recorded, customer notified, dashboard and tamper-evident audit log updated; overdue invoices chased with approved reminders.
 
 **Expected outcome (measurable).** Cut per-receipt handling from ~3 minutes to ~20 seconds; reduce owner reconciliation time from ~6 hrs/week to ~1 hr/week (assumption, to be validated); >90% auto-match accuracy on our labelled synthetic test set (report actual); 100% of recorded payments human-approved and logged. Supports SDG 8.2 and 8.3, plus SDG 9.

@@ -37,6 +37,27 @@ No refunds, no statutory filings, no financial advice.
 
 ---
 
+## The expected outcome
+
+**Measured on the 50-receipt test set** (reproduce with `scripts/eval_accuracy.py`):
+
+- **47 / 50 (94%)** of receipts classified correctly by the deterministic decision path.
+- **0** confident wrong answers — no receipt scored 90+ against the wrong invoice.
+- **100%** of recorded payments human-approved, role-checked and written to a
+  tamper-evident log. Nothing is ever recorded without a person pressing Approve.
+
+**Assumptions, not measurements** — stated as targets, to be validated with real owners:
+
+- Per-receipt handling falls from roughly 3 minutes to about 20 seconds.
+- Owner reconciliation time falls from roughly 6 hours a week to about 1.
+
+**SDG contribution.** Primarily **SDG 8** — target **8.2**, productivity through
+technological upgrading, by removing a nightly manual task; and target **8.3**, support
+for the growth of micro and small enterprises, since late payments and reconciliation
+errors are a cash-flow problem before they are an admin problem. Secondarily **SDG 9**,
+as a reusable module on shared digital infrastructure rather than a bespoke system each
+SME pays to build.
+
 ## What is real, and what is simulated
 
 Being precise about this is part of the submission.
@@ -246,8 +267,12 @@ Three things worth saying plainly:
 
 ## Orbyte fit
 
-Orbit is an Orbyte **app module**, not a standalone app. Everything that belongs to the
-hub crosses one boundary, `OrbyteConnector`:
+Orbit is an Orbyte **app module**, not a standalone app. Hub data crosses one boundary,
+`OrbyteConnector`. Two of its reads and both of its writes are on the live path today:
+every match decision is scored against invoices and customers fetched through it, and
+every approval writes a payment and an activity event back through it. The tenant and
+user reads behind the simulated login still read locally, because login and RBAC are
+the platform foundations the brief says may be simulated.
 
 | Direction | What crosses | Assumed endpoint |
 |---|---|---|

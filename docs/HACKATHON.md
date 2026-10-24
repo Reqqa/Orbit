@@ -196,7 +196,7 @@ approach. Beyond that:
 | Good-to-have | Status |
 |---|---|
 | Explainable decisions | **Strong.** Templated explanations cite matched signals and name missing ones |
-| Reusable building block | **Yes.** `POST /v1/receipts/analyze` plus the connector |
+| Reusable building block | **Partly.** `POST /v1/receipts/analyze` works and returns fields plus ranked candidates, but it takes no customer, so it cannot award the phone signal and rarely reaches a strong match. The connector is the stronger half of this claim |
 | Business model | In [`SPEC.md`](SPEC.md) §16 — freemium, then per-tenant tiers |
 | Growth path | In [`SPEC.md`](SPEC.md) §16 — bank statements, then ASEAN payment rails |
 | Automatic triggers | **Partial.** The webhook is a genuine automatic trigger; the chase ladder runs from a "Run now" button rather than a scheduler (decision log 13) |
