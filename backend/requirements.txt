@@ -33,3 +33,13 @@ httpx==0.28.1
 
 # Tests: matching, classification, RBAC, audit chain. Nothing else.
 pytest>=8.3
+
+# Not used directly: floors on transitive dependencies, because Replit's
+# publish-time security scan blocks a deployment with critical advisories and
+# its Python already ships older copies that satisfy an unpinned requirement.
+# anyio and certifi are the scan's stated fix versions for its critical
+# findings; idna and pygments are the versions the test suite runs on.
+anyio>=4.14.2
+certifi>=2026.10.19
+idna>=3.20
+pygments>=2.21.0
