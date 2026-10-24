@@ -1,20 +1,29 @@
 # Orbit demo script
 
 Shot-by-shot script for the YouTube Unlisted submission video.
-Target 4:30, hard maximum 5:00. Follows the timing table in `docs/SPEC.md` section 15.
+Runs to 5:00 at full length, and the closing beat can end short if you are tight. This
+refines the timing table in
+[SPEC.md](SPEC.md) section 15: the segments and their order are the same, but the
+boundaries moved to give the Orbyte segment the time it needs now that it shows a live API
+response. Where the two disagree, this file is the one to shoot from.
 
 Everything below is shootable against the software as it stands today. No mockups,
 no slides pretending to be screens. Where something is simulated, the presenter says so
 in the same sentence.
 
-**Screens used:** Today, Approvals, Ledger, Chasing, Customers, Audit log,
-WhatsApp simulator, Settings, plus the OpenAPI page at `/docs`.
+**Screens used:** Today `/today`, Approvals `/approvals`, Ledger `/ledger`,
+Chasing `/chasing`, Customers `/customers`, Audit log `/audit`, WhatsApp simulator
+`/simulator`, Settings `/settings`, plus the OpenAPI page at `/docs`.
 
 **URLs.** In development the dashboard is at `http://localhost:3000` and the Python API
 at `http://localhost:8000`, so the OpenAPI page is `http://localhost:8000/docs`. In a
-built deployment FastAPI serves the exported dashboard, so everything — screens and
-`/docs` — is on one URL. Shoot on the built deployment if it is ready; the script works
-either way, and the one-URL point is worth saying out loud.
+built deployment FastAPI serves the exported dashboard from `frontend/out`, so
+everything — screens and `/docs` — is on one URL. **Shoot on the built deployment.** The
+rest of the script works either way, but the Orbyte segment calls `/api/orbyte/status`
+from `/docs` and that only reflects the role switcher when the dashboard and the API share
+an origin, because the session is a signed cookie. On `localhost:8000/docs` with no cookie,
+demo mode falls back to the first Owner in the database, so the tenant switch would not
+show. The one-URL point is also worth saying out loud.
 
 ---
 
@@ -24,12 +33,17 @@ either way, and the one-URL point is worth saying out loud.
 |---|---|---|
 | 0:00–0:25 | The owner's evening (problem) | Innovation & Creativity: specific real pain point |
 | 0:25–0:50 | One sentence and the five steps | Clarity of Proposal |
-| 0:50–2:40 | Live core journey, simulator to paid invoice | Feasibility of Build; Problem-Solution Fit |
-| 2:40–3:20 | Edge cases: duplicate, partial, low confidence | Problem-Solution Fit: accuracy and consistency |
-| 3:20–3:50 | Role switch refused, and the audit chain breaking | Problem-Solution Fit: people stay in control |
-| 3:50–4:15 | Chasing batch | Innovation & Creativity: second burden removed |
-| 4:15–4:40 | Orbyte fit, three tenants, measured numbers | Orbyte fit; business benefit; clarity |
-| 4:40–5:00 | Hardest risk and fallback | Feasibility of Build |
+| 0:50–2:35 | Live core journey, simulator to paid invoice | Feasibility of Build; Problem-Solution Fit |
+| 2:35–3:15 | Edge cases: duplicate, partial, low confidence | Problem-Solution Fit: accuracy and consistency |
+| 3:15–3:45 | Role switch refused, and the audit chain breaking | Problem-Solution Fit: people stay in control |
+| 3:45–4:05 | Chasing batch | Innovation & Creativity: second burden removed |
+| 4:05–4:42 | Orbyte connector live on screen, tenant switch, numbers | Orbyte fit; business benefit; clarity |
+| 4:42–5:00 | Hardest risk and fallback | Feasibility of Build |
+
+The Orbyte segment is now the second longest after the core journey, because it shows a
+live API response rather than describing an adapter. The twelve extra seconds come from
+the outcome beat (25 to 20), chasing (25 to 20) and the closing risk beat (20 to 18).
+Everything else keeps its old budget, and the hard maximum is still 5:00.
 
 ---
 
@@ -57,7 +71,7 @@ windows, zooming into a receipt, then hunting the invoice row.
 
 **On screen.** The Today screen at `/today`, full window. The three cards are visible:
 Needs your approval, Overdue, Received this week. Then the architecture diagram from
-`docs/SPEC.md` section 6.1 as a still, held for about eight seconds, with the five steps
+[SPEC.md](SPEC.md) section 6.1 as a still, held for about eight seconds, with the five steps
 highlighted left to right.
 
 **Presenter says.**
@@ -71,7 +85,7 @@ highlighted left to right.
 
 ---
 
-## 0:50–2:40 — Live core journey
+## 0:50–2:35 — Live core journey
 
 This is the segment that must work. One take, no cuts.
 
@@ -86,10 +100,12 @@ Press **Send**. The receipt image appears in the customer's thread.
 
 **Presenter says.**
 
-> This is Orbit's own WhatsApp simulator, and it is labelled as simulated right there,
-> because we do not have a Meta business account yet. It posts the same webhook payload
-> shape the real Cloud API posts, so the code behind this is the code that would run in
-> production. I am the customer. Here is my receipt, and a message as careless as a real
+> This is Orbit's own WhatsApp simulator, and it is labelled as simulated right there.
+> The real Cloud API path is written — set a token and a phone id and the sender switches
+> to Meta — but we have no Meta business account, so that path has never run against
+> Meta and the whole demo runs on the simulator by design. The simulator posts the same
+> webhook payload shape the real Cloud API posts, so everything behind this screen is the
+> code that would run in production. I am the customer. Here is my receipt, and a message as careless as a real
 > one: paid already boss.
 
 ### 1:15–1:45 — Extraction and the match
@@ -127,7 +143,7 @@ Press **Approve**.
 > original extraction and the corrected values, so we can measure how often humans have to
 > fix us. This one is right. Approve.
 
-### 2:15–2:40 — The outcome
+### 2:15–2:35 — The outcome
 
 **On screen.** Back to `/simulator` for three seconds: the outbound message in the thread,
 *Thanks Khoo Boon Hwa Mini Market, RM 847.00 received for INV-1009. Fully settled — thank
@@ -138,40 +154,45 @@ approval count has dropped and Received this week has gone up.
 **Presenter says.**
 
 > The customer gets a confirmation from a pre-approved template, in their language — we
-> keep English, Bahasa Melayu and Chinese templates and no free-form model wording goes to
-> a customer, ever. The invoice is now Paid, and its timeline shows every step with who did
-> it. The dashboard moved. One approval, start to finish, in about fifteen seconds instead
-> of three minutes. And all of that — proposal, approval, payment, invoice change, message —
-> happened in one database transaction with its audit rows.
+> keep English, Bahasa Melayu and Chinese templates, and no free-form model wording ever
+> goes to a customer. The invoice is now Paid, and its timeline shows every step with who
+> did it. One approval, about fifteen seconds instead of three minutes, and all of it —
+> proposal, approval, payment, invoice change, message — in one database transaction with
+> its audit rows.
 
 ---
 
-## 2:40–3:20 — Edge cases that genuinely work
+## 2:35–3:15 — Edge cases that genuinely work
 
 Keep this brisk. Three short beats.
 
-### Beat 1: duplicate, and the two kinds of duplicate (2:40–2:58)
+### Beat 1: duplicate, and the two kinds of duplicate (2:35–2:55)
 
-**On screen.** `/simulator`. Same customer, upload `003-exact-match.png` again, Send.
-The owner's panel comes back **Duplicate**, headline *Already recorded: RM 847.00*, next
-step *This payment looks like one you already have. Check it before recording it twice.*
+**On screen.** `/simulator`. Same customer as the core journey, upload
+`003-exact-match.png` again, Send. The panel comes back **Duplicate**, headline
+*Already recorded: RM 847.00*, next step *This payment looks like one you already have.
+Check it before recording it twice.* That invoice is already Paid, so there is a payment
+on the books.
 
-Then switch the user in the role switcher to `Lim Wei Keong · OWNER · Sin Heng Hardware
-Trading`, choose `Wong Ah Fook Services`, send `010-exact-match.png` twice without
-approving in between. The second send comes back **Duplicate** with the different next
-step: *The same transaction already arrived and is waiting for a decision (item N). Handle
-that one and reject this copy.*
+Now the other kind. Switch the user in the role switcher to `Lim Wei Keong · OWNER · Sin
+Heng Hardware Trading`, choose `Wong Ah Fook Services` in **Sending as**, and send
+`010-exact-match.png` (RM 2,814.00, `INV-1018`). **Leave it unapproved** — do not open
+`/approvals`. Then send `032-duplicate.png`, which is a different image of the same
+transaction id, `TX4622479024`. The second send comes back **Duplicate** with a different
+next step: *The same transaction already arrived and is waiting for a decision (item N).
+Handle that one and reject this copy.*
 
 **Presenter says.**
 
-> Same receipt, sent twice. Orbit blocks it and tells you why. And it distinguishes the two
-> cases, which matters: this first one is already recorded, so there is a payment on the
-> books and you must not book it again. This second one is a transaction that arrived
-> earlier and is still waiting for a decision — nothing is recorded yet, so the instruction
-> is different: deal with the one in the inbox and reject this copy. A duplicate is always
-> an exception, so it always goes to the owner, never to Finance.
+> Same receipt again, and Orbit blocks it and tells you why. But it distinguishes the two
+> cases, which matters. The first one is already recorded: there is a payment on the books
+> and you must not book it again. This second pair is different — the earlier copy is still
+> waiting for a decision, nothing is recorded yet, so the instruction changes: handle the
+> one in the inbox and reject this copy. Note these are two different photos of one
+> transfer, not the same file twice; the match is on the transaction id. A duplicate is
+> always an exception, so it always goes to the owner, never to Finance.
 
-### Beat 2: partial payment (2:58–3:09)
+### Beat 2: partial payment (2:55–3:05)
 
 **On screen.** Still signed in as the Owner from the previous beat. `/simulator`, sending
 as `Khoo Boon Hwa Resources`, upload `016-partial-payment.png` (RM 297.00 against
@@ -190,7 +211,7 @@ filter **Partial**, and show `INV-1029` with its reduced outstanding.
 > paid with the remaining balance, and the customer's confirmation says what is still
 > outstanding instead of thanking them for settling.
 
-### Beat 3: low confidence goes to a human (3:09–3:20)
+### Beat 3: low confidence goes to a human (3:05–3:15)
 
 **On screen.** `/simulator`. Sending as `Ooi Ah Lek Trading`, upload `040-blurry.png`
 (RM 1,500.84 against `INV-1019`). Send. Badges: **Low Confidence**, **OWNER must
@@ -210,9 +231,9 @@ approve it; leave it sitting in the inbox.
 
 ---
 
-## 3:20–3:50 — People stay in control
+## 3:15–3:45 — People stay in control
 
-### Sales is refused (3:20–3:33)
+### Sales is refused (3:15–3:28)
 
 **On screen.** Role switcher, top right, choose `Ravi Chandran · SALES · Sin Heng
 Hardware Trading`. The badge next to it changes to **SALES**. Go to `/approvals`. The
@@ -228,7 +249,7 @@ browser devtools network tab is already open on a second monitor, show the **403
 > Approve button on screen so you can watch the server refuse it. HTTP 403. The card does
 > not move, nothing is recorded, and the attempt itself is written to the audit log.
 
-### The audit chain, and breaking it on camera (3:33–3:50)
+### The audit chain, and breaking it on camera (3:28–3:45)
 
 **On screen.** `/audit`. Filter **USER** and point at the `APPROVAL_DENIED` row that
 Ravi just produced. Press **Verify integrity** — green: *Chain intact — N rows checked.*
@@ -254,6 +275,13 @@ Back to `/audit`, press **Verify integrity** again — red: *Chain broken at row
 was changed after it was written. row contents do not match the stored hash.* Press
 **Export .jsonl** to show the chain can be re-checked by anyone, outside Orbit.
 
+Verification is scoped to the signed-in tenant, so tamper with a row belonging to the
+tenant you are signed in as — any row from the demo you just shot — and switch back to
+that tenant before pressing Verify. Both SQL lines match the live schema: `audit_log` has
+`id`, `tenant_id`, `actor_type`, `actor_id`, `action`, `entity_type`, `entity_id`,
+`before_json`, `after_json`, `created_at`, `hash_prev`, `hash_self`, with `actor_id`,
+`before_json` and `after_json` all stored as text.
+
 **Presenter says.**
 
 > Every state change in Orbit writes an audit row in the same transaction as the change,
@@ -275,7 +303,7 @@ was changed after it was written. row contents do not match the stored hash.* Pr
 
 ---
 
-## 3:50–4:15 — Chasing
+## 3:45–4:05 — Chasing
 
 **On screen.** `/chasing`. Press **Run now**. Drafts appear with message previews. Scroll
 the **Skipped, and why** card so the guard reasons are readable. Toggle one customer off
@@ -286,70 +314,83 @@ with the per-customer button. Press the batch approve button. Then scroll to **O
 
 > The other half of the evening is chasing. Orbit drafts reminders on a fixed ladder:
 > three days before due, one day after, seven days after. It skips a customer if a payment
-> of theirs is waiting for approval, if they are marked disputed or promised to pay, if we
-> messaged them in the last three days, or if it is outside quiet hours — and it shows you
-> every skip and the reason. Nothing sends until a human approves the batch, and I can drop
-> any customer from it. At fourteen days overdue it stops messaging entirely and creates a
-> task telling the owner to phone them. There is no scheduler in this build: that Run now
-> button is what drives the ladder, which is a deliberate simplification for the demo.
+> of theirs is waiting for approval, if they are disputed or promised to pay, if we messaged
+> them in the last three days, or if it is outside quiet hours — and it shows every skip and
+> the reason. Nothing sends until a human approves the batch, and I can drop anyone from it.
+> At fourteen days it stops messaging and tells the owner to phone instead. There is no
+> scheduler in this build: Run now drives the ladder, deliberately, for the demo.
 
 ---
 
-## 4:15–4:40 — Orbyte fit, reuse, and numbers
+## 4:05–4:42 — The Orbyte connector, live, and the numbers
 
-**On screen.** Three quick things.
+**On screen.** Three things, in this order. Shoot this on the built single-URL deployment
+so `/docs` and the dashboard share the session cookie.
 
-1. The role switcher dropdown, opened so all nine users across the three tenants are
-   visible: Sin Heng Hardware Trading, Roti Lima Bakery Supplies, Cahaya Tuition Centre.
-   Switch to `Goh Chin Hoe · OWNER · Cahaya Tuition Centre` and let `/today` reload with
-   that tenant's own numbers.
-2. `backend/app/connectors/orbyte.py` in the editor, scrolled to the `OrbyteConnector`
-   abstract class so the one-method-per-assumed-endpoint list is visible, then
-   `MockOrbyteConnector` below it.
-3. The OpenAPI page — `/docs` on the one deployment URL, or `localhost:8000/docs` in
-   development — scrolled to `POST /v1/receipts/analyze`.
+1. `/docs`, scrolled to **GET /api/orbyte/status**. Press **Try it out**, then
+   **Execute**, and hold on the response body long enough to read it. Point the cursor at,
+   in order: `"connector": "MockOrbyteConnector"`, the `reads_now` block (tenant name,
+   users, customers, open invoices, outstanding), and `assumed_interface` — four GETs
+   (tenant, users, customers, open invoices) and three POSTs (payments, activity log,
+   notifications). Then at `what_stays_in_orbit`.
+2. The role switcher, top right. Open it so all nine users across the three tenants are
+   visible, switch to `Goh Chin Hoe · OWNER · Cahaya Tuition Centre`, let `/today` reload
+   with that tenant's own numbers, then go back to `/docs` and **Execute** the same
+   endpoint again. Same code, different tenant name and different counts in `reads_now`.
+3. Optional, only if there are seconds left: **GET /api/orbyte/preview** executed once, to
+   show the raw hub records with `"simulated": true` on every one. Cut this first if the
+   segment is running long.
 
 **Presenter says.**
 
-> Orbit is an Orbyte module, not a standalone app. This is the hub interface we code
-> against: one method per endpoint we assume Orbyte exposes — tenants, users and roles,
-> customers, open invoices, record payment, push activity. Behind it today is a mock
-> implementation we wrote, because we have no Orbyte API to call; every value it returns is
-> tagged simulated so nothing in this demo can be mistaken for a real hub read. Swapping in
-> a real HTTP connector is one file. The same module already serves three different trades
-> in the demo data — a hardware trader, a bakery supplier and a tuition centre — three
-> tenants, nine users, seventy-five customers, eighty invoices, all synthetic, and every
-> query is scoped by tenant. And `POST /v1/receipts/analyze` is the reusable building block:
-> image in, structured fields and match candidates out, for any other Orbyte module.
-> On the numbers: forty tests pass across matching, classification, permissions and the
-> audit chain. On fifty labelled synthetic receipts covering all eight classifications, the
-> decision path gets forty-seven right, ninety-four percent. I want to be precise about the
-> extraction figure: with the mock extractor it is a hundred percent by construction,
-> because the mock reads the label file. That is not a measurement of a model, and we say so
-> in `docs/accuracy.md`.
+> Orbit is an Orbyte module, and the connector is on the live path, not decoration. This
+> is Orbit asking the hub seam what it can see, right now. The class answering is
+> MockOrbyteConnector: four reads — company, users and roles, customers, open invoices —
+> and three writes, including a payment record on every approval with an idempotency key,
+> so a retry cannot double-record. Every receipt you just watched was scored against
+> invoices and customer data fetched through this interface. The mock is here because
+> research found no public Orbyte API or sandbox, so these seven endpoints are our
+> assumption and every value comes back tagged simulated. A real HTTP connector implements
+> the same interface and nothing else changes.
+
+> Now the reuse. I switch to a tuition centre, same build, and the same code serves a
+> different SME with its own numbers. Three tenants, nine users, seventy-five customers,
+> eighty invoices, all synthetic, every query scoped by tenant. Forty tests pass. On fifty
+> labelled receipts the decision path gets forty-seven right, ninety-four percent, and
+> extraction is a hundred percent only by construction, because the mock reads the label
+> file — [accuracy.md](accuracy.md) says exactly that.
+
+> **Shooting note.** Keep this to 37 seconds. The two `Execute` presses and the tenant
+> switch are the whole shot; do not also open `backend/app/connectors/orbyte.py` in the
+> editor, which is what an earlier version of this script did. If you want the source on
+> screen, put it in the pitch deck. Two points that fit only if you have the breath, and
+> are worth cutting first: `what_stays_in_orbit` — the keyed phone hash, receipt images,
+> extractions and the audit chain never leave Orbit — and `POST /v1/receipts/analyze`, the
+> reusable building block for any other Orbyte module, image in, fields and candidates
+> out.
 
 ---
 
-## 4:40–5:00 — Hardest risk and fallback
+## 4:42–5:00 — Hardest risk and fallback
 
 **On screen.** The `/simulator` screen again with the amber *Simulated channel* note, held
-still. Optionally end on `/today`, whose footer reads: *Synthetic data only. The WhatsApp
+still. Optionally end on `/today`, and let the footer that sits on every screen be
+readable: *Synthetic data only. The WhatsApp
 channel, the Orbyte hub API and the login are simulated. Orbit records payments that
 already happened and never moves money.*
 
 **Presenter says.**
 
-> Our hardest risk is access to the WhatsApp Business API. Meta business verification,
-> number registration and template approval all take time we do not control, and we do not
-> have a Meta account yet, so there is no real WhatsApp connection in this build. The
-> fallback is what you have been watching: a simulator that posts the same webhook payload
-> shape, so the pipeline, the matching, the approval and the audit log are the real thing
-> and only the transport is stubbed. When the account comes through, we point it at the same
-> webhook endpoint. Second risk is model accuracy on the variety of real Malaysian bank and
-> wallet layouts, and the mitigation is structural rather than hopeful: per-field
-> confidence, low confidence routed to a human, mandatory approval before anything is
-> recorded, and the model swappable behind one interface. Orbit never moves money. It
-> records payments that already happened. Thank you.
+> Our hardest risk is access to the WhatsApp Business API. The Cloud API sender is written,
+> four settings from live, but with no Meta business account it has never run against Meta
+> and I will not claim it works. Verification and template approval are on Meta's timetable,
+> and our chase reminders would need approved templates we have not built. The fallback is
+> what you have been watching: the same webhook payload shape, so the matching, the approval
+> and the audit log are real and only the transport is stubbed. Second risk is accuracy on
+> real bank and wallet layouts; the mitigation is structural — per-field confidence, low
+> confidence to a human, approval before anything is recorded, the model swappable behind
+> one interface. Orbit never moves money. It records payments that already happened.
+> Thank you.
 
 ---
 
@@ -363,21 +404,28 @@ already happened and never moves money.*
    ```
    The images land in `backend/seed/receipts/` and are gitignored; the labels in
    `backend/seed/ground_truth.csv` are committed.
-2. **Decide which build you are shooting.** For one URL: `cd frontend && npm run build`,
-   then run `uvicorn app.main:app` from `backend` and use that single address for
-   everything including `/docs`. For development: `uvicorn app.main:app --reload` plus
-   `npm run dev`, dashboard on `localhost:3000`, `/docs` on `localhost:8000`.
+2. **Build for one URL, and shoot that.** `cd frontend && npm run build`, then run
+   `uvicorn app.main:app` from `backend` and use that single address for everything,
+   including `/docs`. Development mode (`uvicorn app.main:app --reload` plus `npm run dev`,
+   dashboard on `localhost:3000`, `/docs` on `localhost:8000`) works for every segment
+   except the Orbyte one: there the session cookie does not reach `/docs`, so
+   `/api/orbyte/status` answers as the first Owner in the database and the tenant switch
+   does not show.
 3. **Confirm `LLM_PROVIDER=mock`** in `.env`. The mock looks up answers by image SHA-256,
    so the demo needs no network and gives the same result every take.
 4. **Only upload images from `backend/seed/receipts/`.** The mock matches on SHA-256; any
    other image is treated as unreadable and routed to a human as low confidence, which is
    correct behaviour but not the shot you want.
-5. **Have these four files ready in the file picker**, in order of use:
-   `003-exact-match.png` (RM 847.00, INV-1009, Khoo Boon Hwa Mini Market — open invoice,
-   goes to Paid), `010-exact-match.png` (RM 2,814.00, INV-1018, Wong Ah Fook Services —
-   over the Finance limit, so it goes to the Owner), `016-partial-payment.png` (RM 297.00
-   against the RM 595.00 INV-1029, Khoo Boon Hwa Resources), `040-blurry.png` (RM 1,500.84
-   against INV-1019, Ooi Ah Lek Trading, amount confidence 0.54).
+5. **Have these five files ready in the file picker**, in order of use:
+
+   | File | Amount | Invoice | Customer | Used for |
+   |---|---|---|---|---|
+   | `003-exact-match.png` | RM 847.00 | INV-1009 | Khoo Boon Hwa Mini Market | core journey, then the already-recorded duplicate |
+   | `010-exact-match.png` | RM 2,814.00 | INV-1018 | Wong Ah Fook Services | over the RM 2,000 Finance limit, so it routes to the Owner; left unapproved |
+   | `032-duplicate.png` | RM 2,814.00 | INV-1018 | Wong Ah Fook Services | the waiting-copy duplicate: a second photo of the same transaction id, `TX4622479024` |
+   | `016-partial-payment.png` | RM 297.00 | INV-1029, open for RM 595.00 | Khoo Boon Hwa Resources | part payment |
+   | `040-blurry.png` | RM 1,500.84 | INV-1019 | Ooi Ah Lek Trading | low confidence, amount confidence 0.54 |
+
    Use `040-blurry.png` and not `039-blurry.png` for the low-confidence beat: 039 is the
    same customer and the same amount as `010-exact-match.png` within twenty-four hours, so
    after the duplicate beat it is classified as a duplicate, which is correct behaviour but
@@ -386,23 +434,29 @@ already happened and never moves money.*
    (unlimited), `Nurul Aisyah Binti Rahim` FINANCE (capped at RM 2,000), `Ravi Chandran`
    SALES. Other tenants: `Siti Zubaidah Binti Hassan` (Roti Lima Bakery Supplies),
    `Goh Chin Hoe` (Cahaya Tuition Centre).
-7. **Role order.** Start as `Nurul Aisyah Binti Rahim` (FINANCE), so the 0:50–2:40
+7. **Role order.** Start as `Nurul Aisyah Binti Rahim` (FINANCE), so the 0:50–2:35
    approval is done by the role the proposal was actually routed to. Switch to
-   `Lim Wei Keong` (OWNER) for the rest of the edge cases — the RM 2,814 duplicate, the
-   part payment and the blurry receipt all route to the Owner — then to `Ravi Chandran`
-   (SALES) for the 403.
+   `Lim Wei Keong` (OWNER) for the rest of the edge cases — the RM 2,814 pair, the part
+   payment and the blurry receipt all route to the Owner — then to `Ravi Chandran` (SALES)
+   for the 403, and back to an OWNER or FINANCE user for the audit and Orbyte segments.
+   The last switch of the shoot is to `Goh Chin Hoe` (Cahaya Tuition Centre), for the
+   reuse shot.
 8. **Make sure the chasing ladder has something to draft.** Press **Run now** on
    `/chasing` once before recording. If the drafts list is empty, nothing is due today;
    either shoot the Skipped card and the owner-call tasks instead, or shift due dates in
    the seed and re-run it.
 9. **Note the audit row id you will tamper with** before you start the terminal shot, and
-   remember the tamper is irreversible for that database file.
-10. **Stills to prepare:** the section 6.1 architecture diagram with the five steps
+   remember the tamper is irreversible for that database file. Pick a row belonging to the
+   tenant you will be signed in as when you press Verify; verification is per tenant.
+10. **Dry-run the two `/docs` calls.** Press **Try it out** and **Execute** on
+    `GET /api/orbyte/status` once before recording, so the response is already expanded and
+    you know how far to scroll to reach `assumed_interface`.
+11. **Stills to prepare:** the section 6.1 architecture diagram with the five steps
     highlighted, and the burned-in caption *Synthetic data. Simulated WhatsApp channel.*
     for the opening scene.
-11. **Record a backup take of 0:50–2:40** and keep it to hand, in case the live segment
+12. **Record a backup take of 0:50–2:35** and keep it to hand, in case the live segment
     misbehaves on the day.
-12. **Audio and framing:** one window at a time, browser zoom around 110% so the
+13. **Audio and framing:** one window at a time, browser zoom around 110% so the
     confidence bar and the Why-we-think-so lines are legible at 1080p, and no real names,
     numbers or receipts anywhere in frame.
 
@@ -411,9 +465,11 @@ already happened and never moves money.*
 ## Honesty checklist
 
 The presenter must say, out loud and in the same sentence as the thing itself, that the
-following are simulated or not yet built: the WhatsApp channel is a built-in simulator and
-there is **no real WhatsApp Cloud API connection**, because there is no Meta business
-account — only the transport is stubbed, the webhook payload shape is the real one; the
+following are simulated or not yet built: the demo runs on the built-in WhatsApp
+simulator, and while the Cloud API sender is written and switches on with four settings,
+it is **unverified against Meta** because there is no Meta business account — only the
+transport is stubbed, the webhook payload shape is the real one, and live chase reminders
+would additionally need approved template messages that do not exist yet; the
 login and role switcher are a **simulated** session, though the permissions they enforce
 are real server-side checks; the Orbyte hub API is a **mock we wrote ourselves** against
 endpoints we assumed, and every value it returns is tagged simulated; all data is
@@ -426,5 +482,6 @@ Orbit **does not detect forged receipts** and must not be described as fraud det
 it flags duplicates and odd fields and keeps the image for the owner to check against
 their bank app; Orbit **never moves money**, it records payments that already happened;
 and the time and cost figures quoted are **targets against an assumed manual baseline**,
-not a measured pilot. Finally, say what does not exist yet: no Replit deployment, no
-database migrations, and the pitch deck is separate from this video.
+not a measured pilot. Finally, say what does not exist yet: no live WhatsApp connection,
+no Replit deployment, no database migrations, and the pitch deck is separate from this
+video.

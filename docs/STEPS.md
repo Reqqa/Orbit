@@ -10,8 +10,9 @@ Legend: **Do** = the work, **Done when** = the check that proves it. Spec sectio
 ## Phase A — Groundwork (no app code yet)
 
 - [x] **1. Fix `.gitignore`.** Remove the line that ignores `.gitignore` itself; keep `.env`,
-      `*.db`, `__pycache__/`, `.pytest_cache/`, `node_modules/`, `frontend/dist/`; add `.venv/`
-      and `backend/seed/receipts/`.
+      `*.db`, `__pycache__/`, `.pytest_cache/`, `node_modules/`; add `.venv/` and
+      `backend/seed/receipts/`. (The build output is `frontend/out/` plus `frontend/.next/`,
+      not `frontend/dist/` — the frontend is Next.js, decision log 16.)
       *Done when:* `git check-ignore -v .env .venv backend/seed/receipts/x.png` lists all three and
       `git status` still tracks `.gitignore`.
 - [x] **2. Write `CLAUDE.md`** at the repo root: the standing rules from Spec section 20.
@@ -49,7 +50,8 @@ Legend: **Do** = the work, **Done when** = the check that proves it. Spec sectio
       *Done when:* inserting the same `wa_message_id` twice raises IntegrityError. [8]
 - [x] **11. `models.py` part 3, outcome tables:** `payments` (unique `proposal_id`),
       `payment_allocations`, `reminders`, `audit_log` (unique `hash_self`, no update or delete path).
-      *Done when:* all 12 tables are defined and every money column is an integer. [8]
+      *Done when:* all 11 tables are defined and every money column is an integer. (Section 8
+      defines 11; the "12" in section 14 step 1 was a miscount — decision log 15.) [8]
 - [x] **12. Create tables on startup** with `Base.metadata.create_all`.
       *Done when:* `sqlite3 orbit.db ".tables"` lists all 11 tables. (Section 8 defines 11;
       the "12" in section 14 step 1 was a miscount — decision log 15.)
@@ -158,8 +160,10 @@ Legend: **Do** = the work, **Done when** = the check that proves it. Spec sectio
 - [x] **40. SHA-256 extraction cache.** Store the raw JSON in `extractions` keyed by `image_sha256`;
       a repeat extraction of the same image is a cache hit.
       *Done when:* the second call makes no provider call and logs a hit. [decision log 7]
-- [x] **41. `ClaudeExtractor`.** Vision, temperature 0, strict JSON, one retry on invalid JSON, then
-      fall back to `LOW_CONFIDENCE` for human review. Chosen by `LLM_PROVIDER`.
+- [x] **41. `ClaudeExtractor`.** Vision, strict JSON, one retry on invalid JSON, then fall back to
+      `LOW_CONFIDENCE` for human review. Chosen by `LLM_PROVIDER`. Built with **no `temperature`
+      parameter** — current Claude models reject sampling parameters, so determinism comes from an
+      API-enforced JSON response schema (decision log 11).
       *Done when:* with a key set one real image returns valid JSON, and with the key removed the app
       still runs on the mock. [7.1, 12]
 - [x] **42. Wire extraction into the webhook background task.** Store the extraction row against the
@@ -244,7 +248,9 @@ Legend: **Do** = the work, **Done when** = the check that proves it. Spec sectio
 
 ## Phase L — Frontend
 
-- [x] **65. Scaffold `frontend/`** — Vite, React, Tailwind, shadcn/ui, dev proxy to the backend.
+- [x] **65. Scaffold `frontend/`** — React, Tailwind, dev proxy to the backend. Built as
+      **Next.js (App Router) with a static export** and hand-written Tailwind components, not
+      Vite and not shadcn/ui (decision log 12 and 16).
       *Done when:* `npm run dev` shows a styled placeholder page.
 - [x] **66. API client and role switcher.** Typed fetch wrapper, session handling, a header dropdown for
       Owner/Finance/Sales and a visible "Simulated login" badge.
@@ -283,7 +289,8 @@ Legend: **Do** = the work, **Done when** = the check that proves it. Spec sectio
 - [x] **78. Run ten receipts end to end** through the UI and fix what breaks.
       *Done when:* ten out of ten reach the correct final state with no manual DB fixes. [14 checkpoint]
 - [ ] **79. Deploy to Replit** (`.replit`, build step, Secrets, Deployment) and save screenshots to
-      `docs/proof/replit-*.png`.
+      `docs/proof/replit-*.png`. Step-by-step, with the storage finding, in
+      [`connect-replit.md`](connect-replit.md).
       *Done when:* a public URL loads the dashboard and `/api/health`. [18]
 - [ ] **80. Record the backup demo video** of the live segment before anything else changes.
       *Done when:* a watchable clip of the core journey exists on disk. [14 checkpoint, 15]
@@ -291,15 +298,19 @@ Legend: **Do** = the work, **Done when** = the check that proves it. Spec sectio
 ## Phase N — Stretch, strictly in this order
 
 - [ ] **81. Real WhatsApp Cloud API**, time-boxed to three or four hours: test number, `CloudApiSender`,
-      templates, signature. If blocked, stop and keep the simulator.
+      templates, signature. If blocked, stop and keep the simulator. **Partly done:** the code path
+      is written and verified as far as it can be without a Meta account — see the status table and
+      [`connect-whatsapp.md`](connect-whatsapp.md).
       *Done when:* either a real message round-trips, or the time box expired and the decision is
       written into the decision log. [14 step 17, 12]
 - [x] **82. Chasing, the rules.** `services/chasing.py`: the -3, +1, +7, +14 ladder plus the guards
       (pending approval, disputed, promised-pay date, three-day cooloff, quiet hours).
       *Done when:* a dry run over seeded invoices lists the right customers per rung and names the skip
       reason for every exclusion. [7.4]
-- [x] **83. Chasing, scheduler and batch.** APScheduler daily job, a "Run now" button, drafts stored as
-      `reminders` rows, `GET /api/chasing/batch/tomorrow` and `POST /api/chasing/batch/{id}/approve`.
+- [x] **83. Chasing, scheduler and batch.** Built without a background scheduler: the "Run now"
+      button drives the ladder (`services/chasing.py` says so at the top), drafts are stored as
+      `reminders` rows, with `GET /api/chasing/batch/tomorrow` and
+      `POST /api/chasing/batch/{batch_date}/approve`.
       *Done when:* approving a batch sends through the simulator and tracks statuses. [14 step 18]
 - [x] **84. Chasing screen.** Batch preview, per-customer skip toggle, tone, "Approve batch".
       *Done when:* the demo batch can be previewed, trimmed and approved in the UI. [9.4]
@@ -336,7 +347,7 @@ Legend: **Do** = the work, **Done when** = the check that proves it. Spec sectio
 
 ## Status, 2026-10-24
 
-Steps 1 to 78, plus 82 to 86, are done and verified on this machine. What that means
+Steps 1 to 78, plus 82 to 88, are done and verified on this machine. What that means
 concretely:
 
 - `cd backend && python -m pytest -q` → **40 passed**.
@@ -351,11 +362,23 @@ concretely:
 - `cd frontend && npm run build` exports all 9 routes; FastAPI serves them, so the
   dashboard and `/docs` share one URL.
 
+## Beyond the plan
+
+Two pieces of work landed after the 90 steps were written. They are not renumbered; they
+are recorded here.
+
+| What | Where | State |
+|---|---|---|
+| The Orbyte connector moved onto the live decision path | `services/proposals.py` scores every receipt against invoices and customers fetched through `OrbyteConnector`; `services/approval.py` calls `record_payment` (idempotency key `orbit-proposal-<id>`) and `push_activity` on every approval and writes a `HUB_SYNCED` audit row; `GET /api/orbyte/status` and `/api/orbyte/preview` expose it | Done and verified. Still the mock connector, every response tagged `"simulated": true` (decision log 20, [`connect-orbyte.md`](connect-orbyte.md)) |
+| A live WhatsApp sender and inbound media download | `services/notify.py` — `get_sender()` returns `CloudApiSender` (Graph `v26.0`, `httpx`) when `WHATSAPP_TOKEN` and `WHATSAPP_PHONE_ID` are both set, the simulator otherwise; `webhooks/whatsapp.py` downloads inbound media from Meta by media id and saves it through `app.media.save_media` | Code done; verified only against an injected fake `http_post`, never against Meta. Feeds step 81 ([`connect-whatsapp.md`](connect-whatsapp.md)) |
+
+---
+
 **The remaining steps need your accounts or your camera, not more code:**
 
 | Step | Why it is still open |
 |---|---|
-| 79 — Replit deploy | `scripts/replit-start.sh` and `.replit` are committed and the script parses, but every Replit-specific line is unverified and deploying needs your account. The script says so at the top. |
+| 79 — Replit deploy | `scripts/replit-start.sh` and `.replit` are committed and the script parses, but every Replit-specific line is unverified and deploying needs your account. The script says so at the top. [`connect-replit.md`](connect-replit.md) has the walkthrough, and two findings that change the plan: no Replit deployment target keeps filesystem data, so the SQLite file does not survive a redeploy (the boot script reseeds, so it self-heals, but judge clicks are lost), and the only target suited to one SQLite file, Reserved VM, is paid from about USD 15/month. The recommendation there is to record the video against the free development URL and publish only if a persistent link is required. |
 | 80, 89 — demo videos | Needs screen recording and a YouTube upload. `docs/demo-script.md` is the shot-by-shot script. |
-| 81 — real WhatsApp Cloud API | Needs a Meta Business account, a verified number and template approval. The simulator is the committed fallback, which is the decision section 12 anticipated. |
+| 81 — real WhatsApp Cloud API | **Partly done.** The live path is implemented: the sender switches to `CloudApiSender` on configuration and inbound media is downloaded from Meta by media id, both verified as far as they can be here — with an injected fake HTTP post, no Meta account involved. What is left needs accounts, not code: a Meta Business account and test number, a public HTTPS callback URL, and **approved template messages** for the three business-initiated chase reminders, which `CloudApiSender` cannot send as free-form text outside Meta's 24-hour window. Steps and citations: [`connect-whatsapp.md`](connect-whatsapp.md); the gap is in the `docs/SPEC.md` section 12 risk table. The simulator remains the committed fallback and is unaffected. |
 | 90 — submission | The checklist in `docs/SPEC.md` section 18, to walk before you submit. |

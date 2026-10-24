@@ -215,18 +215,6 @@ def decide(
     return decision
 
 
-def open_invoices(
-    session: Session, *, tenant_id: int, customer_id: int | None = None
-) -> list[Invoice]:
-    """Open and partly paid invoices, for one customer or the whole tenant."""
-    stmt = select(Invoice).where(
-        Invoice.tenant_id == tenant_id, Invoice.status.in_(OPEN_STATUSES)
-    )
-    if customer_id is not None:
-        stmt = stmt.where(Invoice.customer_id == customer_id)
-    return list(session.execute(stmt.order_by(Invoice.due_date, Invoice.invoice_no)).scalars())
-
-
 def invoice_view_from_hub(row: dict) -> InvoiceView:
     """Turn one hub invoice record into the shape the scorer takes."""
     return InvoiceView(
@@ -260,18 +248,8 @@ def customer_view_from_hub(
     )
 
 
-def to_invoice_view(invoice: Invoice) -> InvoiceView:
-    return InvoiceView(
-        id=invoice.id,
-        invoice_no=invoice.invoice_no,
-        issue_date=invoice.issue_date,
-        due_date=invoice.due_date,
-        total_sen=invoice.total_sen,
-        outstanding_sen=invoice.outstanding_sen,
-    )
-
-
 def to_customer_view(customer: Customer) -> CustomerView:
+    """Fallback for a customer the hub does not return. Orbit's own row."""
     return CustomerView(
         id=customer.id,
         name=customer.name,

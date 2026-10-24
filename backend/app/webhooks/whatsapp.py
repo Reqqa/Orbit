@@ -19,11 +19,25 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.db import SessionLocal
-from app.media import load_media
-from app.models import ACTOR_CUSTOMER, Customer, Tenant, WhatsappMessage
+from app.media import load_media, save_media
+from app.models import ACTOR_CUSTOMER, ACTOR_SYSTEM, Customer, Tenant, WhatsappMessage
 from app.services.audit import write_audit
 from app.services.crypto import phone_hmac
+from app.services.notify import (
+    GRAPH_BASE_URL,
+    HTTP_TIMEOUT_SECONDS,
+    graph_error_message,
+)
 from app.services.proposals import process_message
+
+# Meta sends image mime types; map the ones it actually sends to a file suffix.
+_MEDIA_SUFFIXES = {
+    "image/jpeg": ".jpg",
+    "image/jpg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+    "application/pdf": ".pdf",
+}
 
 log = logging.getLogger("orbit.webhook")
 
@@ -144,18 +158,107 @@ def _process(message_id: int) -> None:
         if message is None:
             return
         image_bytes = load_media(message.media_ref)
-        if image_bytes is None and message.type == "image":
-            log.warning(
-                "message %s references media %r that is not stored locally; "
-                "downloading Cloud API media needs WHATSAPP_TOKEN",
-                message_id,
-                message.media_ref,
-            )
+
+        # A real inbound image arrives as a Meta media id, not bytes, so there is
+        # nothing on disk yet. Fetch it and rewrite media_ref to the saved
+        # filename, after which the extraction cache and the dashboard image
+        # work exactly as they do for the simulator.
+        #
+        # UNVERIFIED: this download has never run against a real Meta account.
+        if image_bytes is None and message.type == "image" and message.media_ref:
+            if not get_settings().whatsapp_live:
+                log.warning(
+                    "message %s references media %r that is not stored locally; "
+                    "downloading Cloud API media needs WHATSAPP_TOKEN",
+                    message_id,
+                    message.media_ref,
+                )
+            else:
+                try:
+                    downloaded, suffix = _download_cloud_media(message.media_ref)
+                except Exception as exc:  # noqa: BLE001 - never kill the background task
+                    # Leave the message unprocessed rather than letting it reach
+                    # the decision path with no image, where it would be
+                    # classified unreadable for the wrong reason. The audit row
+                    # is the trail; the exception text is Meta's own message and
+                    # contains no token.
+                    log.error(
+                        "media download failed for message %s: %s", message_id, exc
+                    )
+                    session.rollback()
+                    write_audit(
+                        session,
+                        tenant_id=message.tenant_id,
+                        actor_type=ACTOR_SYSTEM,
+                        action="MEDIA_DOWNLOAD_FAILED",
+                        entity_type="whatsapp_message",
+                        entity_id=message_id,
+                        after={"media_ref": message.media_ref, "error": str(exc)[:500]},
+                    )
+                    session.commit()
+                    return
+                image_bytes = downloaded
+                media_ref = save_media(downloaded, suffix)
+                message.media_ref = media_ref
+                write_audit(
+                    session,
+                    tenant_id=message.tenant_id,
+                    actor_type=ACTOR_SYSTEM,
+                    action="MEDIA_DOWNLOADED",
+                    entity_type="whatsapp_message",
+                    entity_id=message_id,
+                    after={"media_ref": media_ref, "bytes": len(downloaded)},
+                )
+                session.commit()
+
         try:
             process_message(session, message_id=message_id, image_bytes=image_bytes)
         except Exception:  # noqa: BLE001 - a background task must not take the app down
             session.rollback()
             log.exception("processing message %s failed", message_id)
+
+
+def _download_cloud_media(media_id: str) -> tuple[bytes, str]:
+    """Two-step Cloud API media download. Returns (bytes, file suffix).
+
+    Step 1 GETs the graph endpoint for the media id, which answers with a
+    short-lived url (Meta documents a five-minute expiry). Step 2 GETs that url
+    with the same Bearer token, which is required even though the url is signed.
+    https://developers.facebook.com/docs/whatsapp/cloud-api/reference/media
+
+    UNVERIFIED: no Meta account exists here, so this has never been run for
+    real. Raises RuntimeError with Meta's own error text on any non-2xx. The
+    token is only ever put in a header and never in a log line or an exception.
+    """
+    import httpx
+
+    token = get_settings().whatsapp_token
+    headers = {"Authorization": f"Bearer {token}"}
+
+    with httpx.Client(timeout=HTTP_TIMEOUT_SECONDS, follow_redirects=True) as client:
+        lookup = client.get(f"{GRAPH_BASE_URL}/{media_id}", headers=headers)
+        if lookup.status_code // 100 != 2:
+            raise RuntimeError(
+                f"media lookup for {media_id} returned {lookup.status_code}: "
+                f"{graph_error_message(lookup.text)}"
+            )
+        described = lookup.json()
+        url = described.get("url")
+        if not url:
+            raise RuntimeError(f"media lookup for {media_id} returned no url")
+
+        download = client.get(url, headers=headers)
+        if download.status_code // 100 != 2:
+            raise RuntimeError(
+                f"media download for {media_id} returned {download.status_code}: "
+                f"{graph_error_message(download.text)}"
+            )
+
+    mime = (
+        download.headers.get("content-type", "").split(";")[0].strip()
+        or described.get("mime_type", "")
+    )
+    return download.content, _MEDIA_SUFFIXES.get(mime, ".png")
 
 
 def _check_signature(raw: bytes, header: str | None) -> None:

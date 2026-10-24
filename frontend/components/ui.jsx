@@ -1,5 +1,5 @@
-// The whole component kit. Six small pieces, shared by every screen, so the
-// dashboard reads as one product without pulling in a component library.
+// The whole component kit, shared by every screen, so the dashboard reads as one
+// product without pulling in a component library.
 
 export function Card({ title, action, children, className = '' }) {
   return (

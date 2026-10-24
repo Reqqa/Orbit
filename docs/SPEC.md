@@ -108,7 +108,7 @@ the visible "people stay in control" feature.
 8. **Outcome.** On approve (one DB transaction): create `payment` record, allocate to invoice(s), update invoice status (`PAID`, `PARTIAL`), update customer ledger balance, write audit entries; then send confirmation to customer ("Thanks Ahmad, RM 850.00 received for INV-1042"). On reject: ask customer for clarification, log reason.
 9. **Dashboard.** Live KPIs and tables update (Section 9).
 
-### 5.2 Second flow (automated chasing, build if time allows)
+### 5.2 Second flow (automated chasing, built; step 18)
 
 1. **Trigger (scheduled).** Daily job at a tenant-configured time finds overdue invoices. A "Run now" button exists for the demo.
 2. **Data.** Invoice, customer, payment history, last reminder sent, customer's preferred language (BM/EN/ZH).
@@ -138,16 +138,19 @@ the visible "people stay in control" feature.
 |                                   Extraction Service (AI)           |
 |                                             |                       |
 |                                             v                       |
-|   Matching Engine (rules) <--> Orbyte Connector (adapter)           |
-|                |                      |                             |
-|                v                      v                             |
-|   Approval Service (RBAC)        Mock Orbyte API (synthetic data)   |
+|   Orbyte Connector (adapter) --> Matching Engine (rules)            |
+|        ^    |   open invoices + customer master data for the match  |
+|        |    v                                                       |
+|        |  Mock Orbyte API (synthetic data, every reply "simulated") |
+|        |                                                            |
+|        |  on approval: record_payment + push_activity (HUB_SYNCED)  |
+|   Approval Service (RBAC)                                           |
 |                |                                                    |
 |                v                                                    |
 |   Ledger Service --> Notification Service --> Sender interface      |
 |                |                     (SimulatorSender / CloudApiSender)
 |                v                                                    |
-|   Audit Log (append-only, hash-chained)   Scheduler (chasing jobs)  |
+|   Audit Log (append-only, hash-chained)   Chasing Service ("Run now")|
 +-------------------+-------------------------------------------------+
                     |
           +---------+----------+
@@ -156,13 +159,20 @@ the visible "people stay in control" feature.
                     |
                     v
         +-----------------------------+
-        | React Dashboard (Vite)      |
+        | Next.js Dashboard (static)  |
         | Owner / Finance / Sales view|
         +-----------------------------+
 
    WhatsApp Simulator (built into dashboard) can replace the real WhatsApp
    channel for demo reliability. Same webhook payload format.
 ```
+
+The Orbyte connector is on the live path, not beside it (decision log 20). Every
+receipt is scored against the open invoices and the customer master record that the
+connector returns, and every approval writes the payment and an activity event back
+through the connector before the audit row is closed. Deliberately **not** sent to the
+hub: the keyed phone HMAC, receipt images, extractions, match proposals and the audit
+chain. `GET /api/orbyte/status` reports the live connector class and what it can see.
 
 ### 6.2 Stack
 
@@ -172,9 +182,9 @@ the visible "people stay in control" feature.
 | DB | SQLite via SQLAlchemy 2.0 | Single file, zero setup, real transactions (needed for atomic approvals) |
 | Frontend | Next.js (App Router, static export) + React + Tailwind | Real routes per screen, one URL in production (FastAPI serves the export), no Node process to deploy. Components and KPI bars are hand-written, so no component or chart library. |
 | AI extraction | Claude vision with strict JSON output, behind an `Extractor` interface | Best accuracy on messy screenshots; swappable; a labelled mock extractor for development |
-| Optional self-host | OCR/vision model on RunPod behind the same interface | "Proof of RunPod utilization" and a PDPA data-residency story. Only claim it if truly used. |
+| Optional self-host | OCR/vision model on RunPod behind the same interface | **Not used.** RunPod is no part of this build, so we claim no RunPod proof. Kept only as the data-residency option in Section 10. |
 | Fuzzy matching | `rapidfuzz` | Payer name similarity |
-| Scheduler | APScheduler | Daily chasing job |
+| Scheduler | None. "Run now" button + batch approval | One less dependency and a deterministic demo; a real deployment points a daily cron at the same function (decision log 13) |
 | Messaging | WhatsApp Business Cloud API (Meta) + built-in simulator | Real integration with safe fallback |
 | Auth | Simulated: role switcher (Owner/Finance/Sales) with signed session cookie | Allowed by brief |
 | Hosting | Replit (Deployments for public URL); FastAPI serves the built frontend so there is one URL | Required proof of Replit usage |
@@ -217,7 +227,7 @@ Rules around extraction:
 - Never let the LLM decide the match or approval. It only reads.
 - Store the raw extraction JSON alongside the final human-approved values (shows human-in-loop corrections and lets us measure accuracy).
 - Cache results by image SHA-256 so demo receipts never depend on a live API call.
-- Temperature 0. Retry once on invalid JSON, then fall back to `LOW_CONFIDENCE` human review.
+- No `temperature` parameter: current Claude models reject sampling parameters, so determinism comes from an API-enforced JSON response schema plus a literal prompt (decision log 11). Retry once on invalid JSON, then fall back to `LOW_CONFIDENCE` human review.
 
 ### 7.2 Match scorecard (weights are configurable per tenant)
 
@@ -349,8 +359,20 @@ State these as **targets and assumptions** and back them with what we can measur
 | Overdue follow-up consistency | Ad hoc | 100% of overdue invoices touched per ladder, with approval |
 | Tasks completed without training | n/a | New user completes first approval in < 60 s (measure with 3-5 testers) |
 
+**Measured so far** (`docs/accuracy.md`, generated by `scripts/eval_accuracy.py` over the
+50 labelled receipts on a fresh seed, mock extractor):
+
+| Measurement | Result | Read it this way |
+|---|---|---|
+| Classification accuracy | 47/50 = 94.0% | The only 3 misses are the DUPLICATE rows, an artefact of the eval approving nothing; duplicate detection is verified working end to end in both forms |
+| Top candidate >= 90 **and** the labelled invoice | 22/50 = 44.0% (22/45 = 48.9% of the receipts that have a labelled invoice at all) | The rest are routed to a human instead of guessed |
+| Top candidate >= 90 on the **wrong** invoice | 0 | No confident wrong answers, which is the number that matters for a payments product |
+| Extraction per-field | 100% **by construction** | The mock extractor reads the label file. This is not a measurement of a model, and must never be quoted without this caveat |
+
+The time figures above stay targets until the timed pilot is run.
+
 **Do this to strengthen credibility (cheap, high impact):**
-- Run the 50-image synthetic test set and report real extraction and match accuracy (put numbers in the README and deck).
+- ~~Run the 50-image synthetic test set~~ **done**, see the table above and [accuracy.md](accuracy.md); carry the same numbers, with the same caveat, into the README and deck.
 - Time 3-5 friends doing the task manually (spreadsheet + chat) vs with Orbit. Report the result as a small pilot ("n=5, synthetic data").
 - If possible, a 10-minute chat with 2-3 real SME owners. Even brief quotes count as real-world validation.
 
@@ -368,6 +390,7 @@ State these as **targets and assumptions** and back them with what we can measur
 | Orbyte API unknown | Integration risk | Adapter pattern + documented assumed endpoints (Section 13); mock implementation |
 | Fake or edited receipts | Fraud | Duplicate detection, owner verification against bank, roadmap: bank statement CSV matching. Not claimed as fraud detection |
 | Scope creep (the biggest build risk) | Nothing finished | Strict step order (Section 14). Chasing is stretch. |
+| **Live reminders need Meta template messages** | On a real WhatsApp connection, the three chase reminders are business-initiated, so outside the 24-hour customer service window Meta rejects free-form text. `CloudApiSender` sends free-form text only, so live chasing would fail loudly (not silently). | Confirmations are replies inside the window and are unaffected. The simulator path, which is what we demo, is unaffected. Fix is a `send_template` branch plus Meta approval of the three templates; documented in `docs/connect-whatsapp.md`. |
 | Replit resource limits | Slowness | Lightweight stack, SQLite, no heavy local models; RunPod only if needed |
 
 ---
@@ -389,6 +412,13 @@ POST /orbyte/v1/notifications                -> optional in-hub alerts
 Webhook: invoice.created, invoice.updated, customer.updated
 ```
 
+**No public Orbyte developer surface exists.** A public-web search found no Orbyte API
+documentation, no sandbox and no developer programme, so there was nothing to code
+against and nothing to check our shape against. The seven endpoints above therefore
+remain our own documented assumption, which the brief allows, and the adapter keeps that
+assumption in one file. The search and what it did turn up are written down in
+[connect-orbyte.md](connect-orbyte.md).
+
 **Why this is stronger than a standalone app:**
 - Reuses Orbyte login, profiles and RBAC instead of rebuilding them.
 - Reuses customer and invoice data, so no re-entry (accuracy).
@@ -407,7 +437,7 @@ Webhook: invoice.created, invoice.updated, customer.updated
 Each step is small and ends with a "done when" check. Do not start a step until the previous one passes.
 
 **Foundation**
-1. **Skeleton, DB models, health endpoint.** Done when `/docs` and `/api/health` load on Replit and the 12 tables exist in `orbit.db`.
+1. **Skeleton, DB models, health endpoint.** Done when `/docs` and `/api/health` load and the 11 tables exist in `orbit.db`.
 2. **Phone privacy helpers** (HMAC lookup + encryption). Done when a number round-trips through encrypt/decrypt and always gives the same HMAC.
 3. **Audit service** (hash chain + verify). Done when a test shows editing any audit row breaks verification.
 4. **Seed script** (3 tenants, users with roles, 25 customers each, invoices with mixed due dates). Done when it prints counts and data is visible.
@@ -431,8 +461,15 @@ Each step is small and ends with a "done when" check. Do not start a step until 
 **Checkpoint:** run 10 receipts end to end. Record a backup demo video. Preliminary-round requirement met.
 
 **Stretch (decided by deadline)**
-17. Real WhatsApp Cloud API (time-boxed 3-4 h; if blocked, keep the simulator).
-18. Chasing (scheduler, ladder, batch approval, "Run now" button).
+17. Real WhatsApp Cloud API. **Code path implemented, unverified against Meta.**
+    `get_sender()` returns `CloudApiSender` when `WHATSAPP_TOKEN` and `WHATSAPP_PHONE_ID`
+    are both set and `SimulatorSender` otherwise; inbound media is downloaded from Meta by
+    media id. Exercised with an injected fake HTTP post only, never against a real Meta
+    account, because there is none on the development machine. Known gap in the Section 12
+    risk table: free-form text only, so live chasing would need approved template messages.
+    Details in [connect-whatsapp.md](connect-whatsapp.md).
+18. Chasing (ladder, batch approval, "Run now" button). **Done.** No scheduler was added
+    (decision log 13).
 19. Accuracy evaluation on 50 receipts + KPI strip.
 20. Submission pack (README, tech tools declaration, deck, video).
 
@@ -449,48 +486,74 @@ orbit/
   .replit  .gitignore  .env.example
   docs/
     SPEC.md                    # this document
+    STEPS.md                   # the numbered build plan and its state
     demo-script.md
-    proof/replit-*.png
-    proof/runpod-*.png         # only if applicable
+    accuracy.md                # GENERATED by scripts/eval_accuracy.py, never hand-edited
+    connect-whatsapp.md        # what going live on Meta actually needs
+    connect-replit.md          # Replit targets, persistence, cost
+    connect-orbyte.md          # the search for a real Orbyte API, and the outcome
+    proof/                     # Replit screenshots (not captured yet)
   backend/
     requirements.txt
     app/
-      main.py  config.py  db.py  models.py
-      auth/            (simulated login, rbac.py)
-      connectors/      (orbyte_base.py, orbyte_mock.py)
-      webhooks/        (whatsapp.py)
+      main.py  config.py  db.py  models.py  schemas.py  money.py  media.py
+      api/             (session.py, approvals.py, data.py, audit.py, chasing.py,
+                        orbyte.py, simulator.py  -- seven routers)
+      auth/            (session.py simulated login, rbac.py)
+      connectors/      (orbyte.py  -- the interface AND MockOrbyteConnector in one
+                        file, deliberately, to keep the repo small)
+      webhooks/        (whatsapp.py  -- GET handshake, POST delivery, Cloud API sender)
       services/        (crypto.py, audit.py, extraction.py, matching.py, classify.py,
-                        approval.py, ledger.py, notify.py, chasing.py)
-      templates/       (whatsapp messages BM/EN/ZH)
-    tests/             (test_matching.py, test_classify.py, test_rbac.py, test_audit_chain.py)
-    seed/              (generate_data.py, generate_receipts.py, ground_truth.csv)
+                        proposals.py, approval.py, ledger.py, notify.py, chasing.py)
+      templates/       (messages.py  -- WhatsApp message templates BM/EN/ZH)
+    tests/             (conftest.py, test_matching.py, test_classify.py, test_rbac.py,
+                        test_audit_chain.py)
+    seed/              (generate_data.py, generate_receipts.py, ground_truth.csv,
+                        receipts/  -- gitignored, regenerates byte-identical)
+    media/                     # receipt images saved by webhook and simulator, gitignored
   frontend/                    # Next.js dashboard, static export
     package.json  next.config.mjs  postcss.config.mjs  jsconfig.json
-    app/                       # one route per screen: today, approvals, ledger,
-                               # chasing, customers, audit, simulator, settings
-      layout.jsx  globals.css
+    app/                       # layout.jsx, globals.css, page.jsx, and one route per
+                               # screen: today, approvals, ledger, chasing,
+                               # customers, audit, simulator, settings
     components/
       Shell.jsx                # header, nav, role switcher, session context
       Screen.jsx  ui.jsx       # the whole component kit
       pages/                   # the eight screen components
     lib/api.js                 # every backend call
-  scripts/ (eval_accuracy.py, replit-start.sh)
+    out/                       # the built export, gitignored; FastAPI serves it
+  scripts/
+    eval_accuracy.py           # writes docs/accuracy.md
+    replit-start.sh            # Replit boot sequence (unverified, no Repl yet)
 ```
 
 ### 14.2 API endpoints (minimum)
 
+A minimum list, not a dump: `/docs` carries all 25 documented paths.
+
 ```
-POST /webhooks/whatsapp              inbound messages (verify signature)
 GET  /webhooks/whatsapp              Meta verification handshake
+POST /webhooks/whatsapp              inbound messages (verify signature)
 GET  /api/health
-GET  /api/approvals?status=pending
+GET  /api/session                    current role, tenant, simulated-login notice
+POST /api/session                    role switch (demo mode)
+GET  /api/session/users
+GET  /api/approvals?status=pending   GET /api/approvals/{id}
 POST /api/approvals/{id}/decision    {decision, note, edits}  (RBAC + limit enforced)
 GET  /api/invoices, /api/customers, /api/payments
+GET  /api/invoices/{id}/timeline     invoice history for the ledger drill-down
 GET  /api/dashboard/summary
+GET  /api/settings   PUT /api/settings          (Owner only)
+GET  /api/media/{media_ref}          the stored receipt image
 GET  /api/audit?filters   GET /api/audit/verify   GET /api/audit/export.jsonl
-GET  /api/chasing/batch/tomorrow    POST /api/chasing/batch/{id}/approve
-POST /api/simulator/send            (demo mode only)
-POST /v1/receipts/analyze           reusable building block
+GET  /api/chasing/batch/tomorrow     POST /api/chasing/run-now
+POST /api/chasing/batch/{batch_date}/approve
+GET  /api/orbyte/status              live connector class, what it can see, and the
+                                     seven assumed endpoints
+GET  /api/orbyte/preview             the raw hub records behind a decision
+POST /api/simulator/send             (demo mode only)
+GET  /api/simulator/thread/{customer_id}
+POST /v1/receipts/analyze            reusable building block
 ```
 
 ### 14.3 Tests (only these, kept small)
@@ -581,7 +644,7 @@ Bank statement CSV matching to confirm receipts independently; e-invoice readine
 
 ## 20. Quality bar (mirrored in CLAUDE.md)
 
-- Stack: Python 3.11 + FastAPI + SQLAlchemy 2.0 + SQLite (backend/), React + Vite + Tailwind (frontend/).
+- Stack: Python 3.12 + FastAPI + SQLAlchemy 2.0 + SQLite (backend/), Next.js + React + Tailwind, static export (frontend/). See decision logs 9, 16 and 17.
 - Product name is "Orbit". It is a module for the Orbyte hub (Orbyte is the host platform, not us).
 - Runs on Replit. Licence: Apache 2.0. Synthetic data only, never real personal data.
 - Keep code simple and boring. The demo must work every time. No over-engineering.
@@ -611,7 +674,7 @@ Bank statement CSV matching to confirm receipts independently; e-invoice readine
 | 8 | FastAPI serves the built frontend in deployment | One public URL for judges. |
 | 9 | Python 3.12 instead of 3.11 | 3.11 is not installed on the dev machine (3.12/3.13/3.14 are). 3.12 is the closest version with mature wheels for FastAPI, SQLAlchemy and Pydantic; 3.14 is too new to trust for demo reliability. |
 | 10 | SQLAlchemy pinned to the 2.0 line (`>=2.0.36,<2.1`) | An unpinned install resolved to 2.1, a different major line from the one this spec was written against. Pinning keeps the ORM behaviour matching Section 8. |
-| 11 | No `temperature` on the extraction call | Section 7.1 asks for temperature 0, but current Claude models reject sampling parameters with a 400. Determinism comes from an API-enforced JSON response schema plus a literal prompt, which is stronger than temperature 0 was. |
+| 11 | No `temperature` on the extraction call | Section 7.1 originally asked for temperature 0, but current Claude models reject sampling parameters with a 400. Determinism comes from an API-enforced JSON response schema plus a literal prompt, which is stronger than temperature 0 was. |
 | 12 | Hand-rolled Tailwind components instead of shadcn/ui, and no Recharts | MVP, and the repo stays small. shadcn copies dozens of component files in; the dashboard needs about six small ones. KPI bars are plain CSS. |
 | 13 | No APScheduler. Chasing runs from a "Run now" button | One less dependency and a deterministic demo. A real deployment points a daily cron at the same function. |
 | 14 | Official `anthropic` SDK rather than raw HTTP | Anthropic's own guidance for a Python project. It is a single dependency and is imported lazily, so the default mock path does not need it. |

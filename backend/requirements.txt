@@ -21,7 +21,15 @@ pillow>=11.0
 
 # Claude vision for receipt extraction. Only imported when LLM_PROVIDER=claude,
 # so the mock path runs without it.
-anthropic>=1.0
+# 2.3 or newer: ClaudeExtractor uses the output_config JSON-schema shape, which
+# the 1.x SDK does not accept.
+anthropic>=2.3,<3
+
+# HTTP client for the live WhatsApp Cloud API path: sending a message and the
+# two-step inbound media download. Already present as a transitive dependency of
+# the anthropic SDK, pinned here to the version that is actually installed so a
+# fresh deployment cannot get a different one by accident.
+httpx==0.28.1
 
 # Tests: matching, classification, RBAC, audit chain. Nothing else.
 pytest>=8.3

@@ -2,6 +2,7 @@
 
 Orbit, payment reconciliation for the Orbyte hub.
 Full specification: `docs/SPEC.md`. Build order: `docs/STEPS.md`.
+How the code fits together: `docs/ARCHITECTURE.md`.
 
 ## Naming
 
@@ -35,6 +36,15 @@ Full specification: `docs/SPEC.md`. Build order: `docs/STEPS.md`.
    accounts. No secrets committed; use `.env` locally and Replit Secrets in deployment.
 8. **We never move money.** Orbit records and reconciles payments that already happened. No refunds,
    no statutory filings, no legal or financial advice.
+9. **The Orbyte boundary is one-way and explicit.** Hub data — tenant, users and roles, customers,
+   open invoices — is read through `OrbyteConnector`, never by a direct query, and an approval writes
+   the payment and the activity event back through it. Orbit's own data never crosses to the hub: the
+   keyed phone HMAC, receipt images, extractions, match proposals and the audit chain. The hub gets
+   decisions, not deliberation.
+10. **Four seams, one factory function each.** Extractor (`get_extractor`), Sender (`get_sender`),
+    `OrbyteConnector` (`get_connector`) and the login (the session dependency in `auth/session.py`).
+    Each returns an implementation and is the only place that chooses one, so swapping mock for real
+    is a one-line change and no caller moves.
 
 ## How to work
 
