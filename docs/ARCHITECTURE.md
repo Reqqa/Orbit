@@ -10,7 +10,7 @@ exactly one function, reading an image into JSON.
 
 Counts, for orientation: 44 Python files under `backend/` (including `__init__.py`), 22
 JS/JSX files under `frontend/app`, `frontend/components` and `frontend/lib`, 11 database
-tables, 25 documented API paths on `/docs`, 40 tests in 4 files. Companion documents:
+tables, 25 documented API paths on `/docs`, 42 tests in 5 files. Companion documents:
 [SPEC.md](SPEC.md) (spec and decision log), [accuracy.md](accuracy.md) (generated — do
 not hand-edit), [STEPS.md](STEPS.md), [demo-script.md](demo-script.md), and the research
 notes [connect-whatsapp.md](connect-whatsapp.md), [connect-replit.md](connect-replit.md),
@@ -150,7 +150,7 @@ WhatsApp / simulator
 | `seed/generate_data.py` | The deterministic dataset: 3 tenants, 9 users, 75 customers, 80 invoices, one fixed seed, due dates anchored to today. |
 | `seed/generate_receipts.py` | 50 synthetic receipt PNGs drawn with Pillow plus the committed `seed/ground_truth.csv`, keyed by image SHA-256. The images are gitignored and regenerate byte-identical. |
 | `tests/conftest.py` | Points `DATABASE_URL` at a temp file **before** importing `app`, because `app.db` builds the engine and `get_settings` caches on first call. Throwaway database per test. |
-| `tests/test_matching.py` · `test_classify.py` · `test_rbac.py` · `test_audit_chain.py` | 40 tests over the scorecard, the eight verdicts, approval permissions, and chain tampering. **There are no UI, webhook, or seed tests, by design** — the webhook and simulator paths are exercised by hand. |
+| `tests/test_matching.py` · `test_classify.py` · `test_duplicate_recording.py` · `test_rbac.py` · `test_audit_chain.py` | 42 tests over the scorecard, the eight verdicts, recording a receipt once, approval permissions, and chain tampering. **There are no UI, webhook, or seed tests, by design** — the webhook and simulator paths are exercised by hand. |
 
 ---
 

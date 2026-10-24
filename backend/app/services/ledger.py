@@ -7,6 +7,7 @@ all land or none of them do (docs/SPEC.md section 5.1 step 8).
 
 from datetime import datetime
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import (
@@ -53,6 +54,37 @@ def apply_payment(
             f"Allocated {fmt_sen(allocated)} but the payment is only {fmt_sen(amount_sen)}."
         )
 
+    # Checked here, at the moment of recording, not only when the receipt arrived:
+    # two copies of one receipt can both be waiting, and approving the first must
+    # stop the second from recording the same money again.
+    if transaction_id:
+        already = session.execute(
+            select(Payment.id).where(
+                Payment.tenant_id == proposal.tenant_id,
+                Payment.transaction_id == transaction_id,
+            )
+        ).scalars().first()
+        if already is not None:
+            raise LedgerError(
+                f"Transaction {transaction_id} is already recorded as payment {already}. "
+                "Reject this copy."
+            )
+
+    invoices: dict[int, Invoice] = {}
+    for allocation in allocations:
+        invoice = session.get(Invoice, allocation.invoice_id)
+        if invoice is None or invoice.tenant_id != proposal.tenant_id:
+            raise LedgerError(f"Invoice {allocation.invoice_id} is not in this business.")
+        if allocation.amount_sen <= 0:
+            raise LedgerError(f"Allocation for {invoice.invoice_no} must be positive.")
+        if allocation.amount_sen > invoice.outstanding_sen:
+            raise LedgerError(
+                f"{invoice.invoice_no} has only {fmt_sen(invoice.outstanding_sen)} outstanding, "
+                f"so {fmt_sen(allocation.amount_sen)} cannot be recorded against it. "
+                "It may already have been paid."
+            )
+        invoices[allocation.invoice_id] = invoice
+
     payment = Payment(
         tenant_id=proposal.tenant_id,
         customer_id=proposal.customer_id,
@@ -85,12 +117,7 @@ def apply_payment(
     )
 
     for allocation in allocations:
-        invoice = session.get(Invoice, allocation.invoice_id)
-        if invoice is None or invoice.tenant_id != proposal.tenant_id:
-            raise LedgerError(f"Invoice {allocation.invoice_id} is not in this business.")
-        if allocation.amount_sen <= 0:
-            raise LedgerError(f"Allocation for {invoice.invoice_no} must be positive.")
-
+        invoice = invoices[allocation.invoice_id]
         before = {"outstanding_sen": invoice.outstanding_sen, "status": invoice.status}
 
         session.add(
@@ -101,7 +128,7 @@ def apply_payment(
             )
         )
 
-        invoice.outstanding_sen = max(0, invoice.outstanding_sen - allocation.amount_sen)
+        invoice.outstanding_sen -= allocation.amount_sen
         if invoice.outstanding_sen == 0:
             invoice.status = INVOICE_PAID
         elif invoice.outstanding_sen < invoice.total_sen:

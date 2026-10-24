@@ -41,7 +41,7 @@ All from `backend/requirements.txt`. One line each, what it is actually for.
 | pillow | `>=11.0` | 13.0.0 | Draws the 50 synthetic receipt PNGs in the seed step |
 | anthropic | `>=1.0` | 2.3.0 | The Claude API SDK. Imported lazily inside the Claude extractor, so the default mock path never needs it |
 | httpx | `==0.28.1` | 0.28.1 | The HTTP client for the live WhatsApp Cloud API path in `backend/app/services/notify.py`: sending a text message, and the two-step inbound media download in `backend/app/webhooks/whatsapp.py`. It arrived anyway as a transitive dependency of the `anthropic` SDK; it is pinned exactly so a fresh deployment cannot resolve a different version by accident. Imported lazily, so the simulator path does not need it at import time |
-| pytest | `>=8.3` | 9.1.1 | The 40 tests: matching, classification, RBAC, audit hash chain. Nothing else is tested |
+| pytest | `>=8.3` | 9.1.1 | The 42 tests: matching, classification, duplicate recording, RBAC, audit hash chain. Nothing else is tested |
 
 No other backend dependency is used. No OCR engine, no ML framework, no task queue, no
 message broker, no Redis, no Postgres, no Docker.

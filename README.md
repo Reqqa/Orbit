@@ -65,7 +65,7 @@ Being precise about this is part of the submission.
 | Part | Status |
 |---|---|
 | Receipt reading, matching, classification, approval, ledger, audit log, chasing | **Real**, running code, verified end to end |
-| 40 tests over matching, classification, RBAC and the audit hash chain | **Real**, passing |
+| 42 tests over matching, classification, duplicate recording, RBAC and the audit hash chain | **Real**, passing |
 | Dashboard, all eight screens | **Real**, Next.js static export served by FastAPI |
 | WhatsApp channel | **Live code path written, unverified.** `get_sender()` returns `CloudApiSender` (Graph `v26.0`) once `WHATSAPP_TOKEN` and `WHATSAPP_PHONE_ID` are set, and inbound media is then downloaded from Meta by media id; with those unset it is the built-in simulator, which posts identical Meta-shaped payloads through the same webhook code. There is no Meta Business account here, so the live path has only run against injected fakes, and `CloudApiSender` sends free-form text only — the three business-initiated chase reminders would need approved template messages. [`docs/connect-whatsapp.md`](docs/connect-whatsapp.md) |
 | Orbyte hub API | **Simulated, but genuinely on the live path.** We define the endpoints ourselves (`docs/SPEC.md` §13) and ship a mock connector reading the local database. Every receipt is scored against invoices fetched through the connector, and every approval writes a payment and an activity event back through it. Every response carries `"simulated": true`. See `GET /api/orbyte/status`. |
@@ -220,6 +220,7 @@ expensive:
 |---|---|
 | `tests/test_matching.py` | The scorecard: exact, partial, overpayment, reference normalisation, alias matching, phone match, future dates, ranking and tie-breaks, multi-invoice sums |
 | `tests/test_classify.py` | All eight classifications and their precedence |
+| `tests/test_duplicate_recording.py` | A receipt is recorded once: a second copy of a recorded transaction, or money against an invoice already paid, is refused at approval |
 | `tests/test_rbac.py` | Sales cannot approve, Finance cannot exceed its limit, every refusal is audited |
 | `tests/test_audit_chain.py` | Editing or deleting any audit row breaks verification, and tenants' chains are independent |
 
@@ -262,11 +263,16 @@ Three things worth saying plainly:
   counted on its own line.
 - **All three misses are the `DUPLICATE` rows, and they are an artefact of the eval.**
   Duplicate detection needs the earlier copy to already be in the ledger, and the eval
-  approves nothing, so it sees each receipt in isolation. Duplicate detection is
-  verified working end to end in both of its forms — against a recorded payment
-  ("already recorded") and against an earlier copy still waiting for a decision — and
-  you can watch it in the demo with `032-duplicate.png` after sending
-  `010-exact-match.png`.
+  approves nothing, so it sees each receipt in isolation. Duplicate detection works in
+  both of its forms — against a recorded payment ("already recorded") and against an
+  earlier copy still waiting for a decision — and you can watch it in the demo with
+  `032-duplicate.png` after sending `010-exact-match.png`.
+- **Classification alone was not enough, and end-to-end testing showed it.** With two
+  copies of one receipt waiting, the second was flagged `DUPLICATE` but the first kept
+  its `EXACT_MATCH`, and approving both recorded the same transfer twice while the
+  invoice still read PAID. Recording now refuses a transaction id that is already in
+  the ledger, and any allocation larger than what the invoice still owes, so the
+  second approval fails with "already recorded as payment N. Reject this copy."
 
 ---
 
@@ -413,7 +419,7 @@ backend/            Python 3.12 + FastAPI + SQLAlchemy + SQLite (44 .py files)
     templates/      messages.py — BM / EN / ZH message templates
   seed/             generate_data.py, generate_receipts.py, ground_truth.csv
   tests/            test_matching, test_classify, test_rbac, test_audit_chain,
-                    conftest (40 tests)
+                    test_duplicate_recording, conftest (42 tests)
 frontend/           Next.js dashboard, static export into frontend/out
                     (gitignored; 22 .js/.jsx files)
   app/              one route per screen
